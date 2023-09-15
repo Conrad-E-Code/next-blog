@@ -1,6 +1,6 @@
 "use client";
 import {$getRoot, $getSelection} from 'lexical';
-import {useEffect} from 'react';
+import {useEffect, useState} from 'react';
 
 import {LexicalComposer} from '@lexical/react/LexicalComposer';
 import {PlainTextPlugin} from '@lexical/react/LexicalPlainTextPlugin';
@@ -22,6 +22,8 @@ const MyLexicalComponent = () => {
       return null;
     }
 
+
+
     // Catch any errors that occur during Lexical updates and log them
 // or throw them as needed. If you don't throw them, Lexical will
 // try to recover gracefully without losing user data.
@@ -30,21 +32,28 @@ function onError(error) {
   }
   
   function Editor() {
+    const [editorState, setEditorState] = useState();
     const initialConfig = {
       namespace: 'MyEditor',
       theme,
       onError,
     };
+    function handleSubmit() {
+      console.log("Submitting...")
+      console.log("EditorState:", editorState)
+    }
 
     return (
         <LexicalComposer initialConfig={initialConfig}>
           <PlainTextPlugin
             contentEditable={<ContentEditable />}
-            placeholder={<div>Enter some text...</div>}
+            placeholder={<div className="rounded text-fuchsia-100">Enter some text...</div>}
             ErrorBoundary={LexicalErrorBoundary}
           />
           <HistoryPlugin />
           <MyLexicalComponent />
+          <OnChangePlugin onChange={(lexState) => { setEditorState(lexState)}}/>
+          <button onClick={handleSubmit}>Howdy</button>
         </LexicalComposer>
       );
     }
