@@ -18,7 +18,9 @@ const theme = {
     italic: "italic"
   },
   heading: {
-    h1: "text-2xl font-bold"
+    h1: "text-3xl font-bold",
+    h2: "text-2xl font-semibold",
+    h3: "text-xl"
   }
     // Theme styling goes here
   }
@@ -34,17 +36,19 @@ const MyAutoFocusPlugin = () => {
 const MyHeaderPlugin = () => {
   const [editor] = useLexicalComposerContext();
 
-  function onClick(e) {
+  function onClick(tag) {
     editor.update(() => {
       const selection = $getSelection()
       if ($isRangeSelection(selection)) {
-        $setBlocksType(selection, () => $createHeadingNode('h1'))
+        $setBlocksType(selection, () => $createHeadingNode(tag))
       }
     })
 
 
   }
-  return  <button onClick={onClick}> Insert Heading</button>;
+  return  <div>{["h1","h2", "h3"].map((tag) => {
+    return (<button key={`header-button-${tag}`} className='px-1 mx-4' onClick={() => {onClick(tag)}}>Add {tag}</button>)
+  })}</div>
 }
 
 
