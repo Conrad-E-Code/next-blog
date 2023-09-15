@@ -1,10 +1,10 @@
 import React from 'react'
-import MyLexicalComponent from './MyLexicalComponent'
+import Editor from './Editor'
 
 const EditorContainer = () => {
   return (
     <div className='justify-center text-center bg-blue-600 mx-4 my-4'>
-    <MyLexicalComponent />
+    <Editor />
 
     
   </div>  )

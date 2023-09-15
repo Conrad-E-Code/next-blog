@@ -3,13 +3,14 @@ import {$getRoot, $getSelection} from 'lexical';
 import {useEffect, useState} from 'react';
 
 import {LexicalComposer} from '@lexical/react/LexicalComposer';
-import {PlainTextPlugin} from '@lexical/react/LexicalPlainTextPlugin';
+import {RichTextPlugin} from '@lexical/react/LexicalRichTextPlugin';
 import {ContentEditable} from '@lexical/react/LexicalContentEditable';
 import {HistoryPlugin} from '@lexical/react/LexicalHistoryPlugin';
 import {OnChangePlugin} from '@lexical/react/LexicalOnChangePlugin';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary';
 const theme = {
+  ltr: "text-left"
     // Theme styling goes here
   }
 const MyLexicalComponent = () => {
@@ -45,9 +46,9 @@ function onError(error) {
 
     return (
         <LexicalComposer initialConfig={initialConfig}>
-          <PlainTextPlugin
-            contentEditable={<ContentEditable />}
-            placeholder={<div className="rounded text-fuchsia-100">Enter some text...</div>}
+          <RichTextPlugin
+            contentEditable={<ContentEditable className='p-4 w-5/6 h-[500px] bg-black text-lime-400 my-10 mx-auto rounded border-gray-600 border-[35px] relative text-left' />}
+            placeholder={<div className="rounded text-fuchsia-100 absolute top-40 left-0 right-0">Start Typing...</div>}
             ErrorBoundary={LexicalErrorBoundary}
           />
           <HistoryPlugin />
