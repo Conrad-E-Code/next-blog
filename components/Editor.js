@@ -1,5 +1,5 @@
 "use client";
-import {$getRoot, $getSelection} from 'lexical';
+import {$createTextNode, $getRoot, $getSelection} from 'lexical';
 import {useEffect, useState} from 'react';
 
 import {LexicalComposer} from '@lexical/react/LexicalComposer';
@@ -9,19 +9,40 @@ import {HistoryPlugin} from '@lexical/react/LexicalHistoryPlugin';
 import {OnChangePlugin} from '@lexical/react/LexicalOnChangePlugin';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary';
+import {HeadingNode, $createHeadingNode} from "@lexical/rich-text"
 const theme = {
-  ltr: "text-left"
+  ltr: "text-left",
+  text: {
+    bold: "font-boldest",
+    italic: "italic"
+  },
+  heading: {
+    h1: "text-2xl font-bold"
+  }
     // Theme styling goes here
   }
-const MyLexicalComponent = () => {
+const MyAutoFocusPlugin = () => {
     const [editor] = useLexicalComposerContext();
     useEffect(() => {
         // Focus the editor when the effect fires!
         editor.focus();
       }, [editor]);
     
-      return null;
+      return null
     }
+const MyHeaderPlugin = () => {
+  const [editor] = useLexicalComposerContext();
+
+  function onClick(e) {
+    editor.update(() => {
+      const root = $getRoot()
+      root.append($createHeadingNode('h1').append($createTextNode("Howdy Doo!")))
+    })
+
+
+  }
+  return  <button onClick={onClick}> Insert Heading</button>;
+}
 
 
 
@@ -37,6 +58,7 @@ function onError(error) {
     const initialConfig = {
       namespace: 'MyEditor',
       theme,
+      nodes: [HeadingNode],
       onError,
     };
     function handleSubmit() {
@@ -45,16 +67,18 @@ function onError(error) {
     }
 
     return (
-        <LexicalComposer initialConfig={initialConfig}>
+        <LexicalComposer initialConfig={initialConfig} className={'relative'}>
+          <MyHeaderPlugin />
           <RichTextPlugin
-            contentEditable={<ContentEditable className='p-4 w-5/6 h-[500px] bg-black text-lime-400 my-10 mx-auto rounded border-gray-600 border-[35px] relative text-left' />}
+            contentEditable={<ContentEditable className='p-4 w-5/6 h-[500px] bg-black text-lime-400  mx-auto rounded border-gray-600 border-[35px] relative text-left overflow-y-scroll' />}
             placeholder={<div className="rounded text-fuchsia-100 absolute top-40 left-0 right-0">Start Typing...</div>}
             ErrorBoundary={LexicalErrorBoundary}
           />
           <HistoryPlugin />
-          <MyLexicalComponent />
+          <MyAutoFocusPlugin />
           <OnChangePlugin onChange={(lexState) => { setEditorState(lexState)}}/>
-          <button onClick={handleSubmit}>Howdy</button>
+        
+          <button onClick={handleSubmit}>SUBMIT</button>
         </LexicalComposer>
       );
     }
