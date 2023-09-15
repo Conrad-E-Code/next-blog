@@ -1,5 +1,5 @@
 "use client";
-import {$createTextNode, $getRoot, $getSelection} from 'lexical';
+import {$createTextNode, $getRoot, $getSelection, $isRangeSelection} from 'lexical';
 import {useEffect, useState} from 'react';
 
 import {LexicalComposer} from '@lexical/react/LexicalComposer';
@@ -10,6 +10,7 @@ import {OnChangePlugin} from '@lexical/react/LexicalOnChangePlugin';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary';
 import {HeadingNode, $createHeadingNode} from "@lexical/rich-text"
+import {$setBlocksType} from "@lexical/selection"
 const theme = {
   ltr: "text-left",
   text: {
@@ -35,8 +36,10 @@ const MyHeaderPlugin = () => {
 
   function onClick(e) {
     editor.update(() => {
-      const root = $getRoot()
-      root.append($createHeadingNode('h1').append($createTextNode("Howdy Doo!")))
+      const selection = $getSelection()
+      if ($isRangeSelection(selection)) {
+        $setBlocksType(selection, () => $createHeadingNode('h1'))
+      }
     })
 
 
