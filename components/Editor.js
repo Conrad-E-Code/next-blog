@@ -1,5 +1,5 @@
 "use client";
-import {$createTextNode, $getRoot, $getSelection, $isRangeSelection} from 'lexical';
+import {$createTextNode, $getRoot, $getSelection, $isRangeSelection, COMMAND_PRIORITY_LOW} from 'lexical';
 import {useEffect, useState} from 'react';
 
 import {LexicalComposer} from '@lexical/react/LexicalComposer';
@@ -10,6 +10,7 @@ import {OnChangePlugin} from '@lexical/react/LexicalOnChangePlugin';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary';
 import {HeadingNode, $createHeadingNode} from "@lexical/rich-text"
+import {ListNode, ListItemNode, INSERT_UNORDERED_LIST_COMMAND, INSERT_ORDERED_LIST_COMMAND, insertList, $handleListInsertParagraph} from "@lexical/list"
 import {$setBlocksType} from "@lexical/selection"
 const theme = {
   ltr: "text-left",
@@ -21,7 +22,12 @@ const theme = {
     h1: "text-3xl font-bold",
     h2: "text-2xl font-semibold",
     h3: "text-xl"
+  },
+  list: {
+    ul: "list-disc"
+
   }
+
     // Theme styling goes here
   }
 const MyAutoFocusPlugin = () => {
@@ -51,6 +57,27 @@ const MyHeaderPlugin = () => {
   })}</div>
 }
 
+const MyListToolbarPlugin = () => {
+  const [editor] = useLexicalComposerContext();
+  editor.registerCommand(INSERT_UNORDERED_LIST_COMMAND, () => {
+    insertList(editor, 'bullet');
+    return true;
+}, COMMAND_PRIORITY_LOW);
+
+  function onClick(tag) {
+    if (tag === "ol") {
+      editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined)
+      return
+    }
+    console.log(INSERT_UNORDERED_LIST_COMMAND)
+    editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined) 
+  }
+  return  <div>
+    {["ul","ol"].map((tag) => {
+    return (<button key={`header-button-${tag}`} className='px-1 mx-4' onClick={() => {onClick(tag)}}>Add {tag}</button>)
+  })}</div>
+}
+
 
 
     // Catch any errors that occur during Lexical updates and log them
@@ -59,13 +86,25 @@ const MyHeaderPlugin = () => {
 function onError(error) {
     console.error(error);
   }
+
+function MyToolbarPlugin() {
+  const [editor] = useLexicalComposerContext()
+  return <div>
+    <MyHeaderPlugin />
+    <MyListToolbarPlugin />
+    <button onClick={() => {
+      editor.update(() => $handleListInsertParagraph())
+    }} >Exit List</button>
+
+  </div>
+}
   
   function Editor() {
     const [editorState, setEditorState] = useState();
     const initialConfig = {
       namespace: 'MyEditor',
       theme,
-      nodes: [HeadingNode],
+      nodes: [HeadingNode, ListNode, ListItemNode],
       onError,
     };
     function handleSubmit() {
@@ -74,10 +113,10 @@ function onError(error) {
     }
 
     return (
-        <LexicalComposer initialConfig={initialConfig} className={'relative'}>
-          <MyHeaderPlugin />
+        <LexicalComposer initialConfig={initialConfig} className={'relative pl-2'}>
+          <MyToolbarPlugin />
           <RichTextPlugin
-            contentEditable={<ContentEditable className='p-4 w-5/6 h-[500px] bg-black text-lime-400  mx-auto rounded border-gray-600 border-[35px] relative text-left overflow-y-scroll' />}
+            contentEditable={<ContentEditable className='p-4 w-5/6 h-[500px] bg-gray-100 text-lime-400  mx-auto rounded border-gray-600 border-[35px] relative text-left overflow-y-scroll' />}
             placeholder={<div className="rounded text-fuchsia-100 absolute top-40 left-0 right-0">Start Typing...</div>}
             ErrorBoundary={LexicalErrorBoundary}
           />
