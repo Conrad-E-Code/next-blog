@@ -12,6 +12,7 @@ import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary';
 import {HeadingNode, $createHeadingNode} from "@lexical/rich-text"
 import {ListNode, ListItemNode, INSERT_UNORDERED_LIST_COMMAND, INSERT_ORDERED_LIST_COMMAND, insertList, $handleListInsertParagraph} from "@lexical/list"
 import {$setBlocksType} from "@lexical/selection"
+import { $isBannerNode, BannerNode, BannerPlugin, INSERT_BANNER_COMMAND } from './BannerPlugin';
 const theme = {
   ltr: "text-left",
   text: {
@@ -24,9 +25,10 @@ const theme = {
     h3: "text-xl"
   },
   list: {
-    ul: "list-disc"
+    ul: "list-disc list-inside"
 
-  }
+  },
+  banner: "bg-red-400"
 
     // Theme styling goes here
   }
@@ -78,6 +80,19 @@ const MyListToolbarPlugin = () => {
   })}</div>
 }
 
+const MyBannerToolBarPlugin = () => {
+  const [editor] = useLexicalComposerContext();
+  function onClick() {
+    console.log()
+    editor.dispatchCommand(INSERT_BANNER_COMMAND, undefined) 
+  }
+
+  return (
+    <button onClick={onClick}> Insert Banner</button>
+  )
+
+}
+
 
 
     // Catch any errors that occur during Lexical updates and log them
@@ -92,6 +107,7 @@ function MyToolbarPlugin() {
   return <div>
     <MyHeaderPlugin />
     <MyListToolbarPlugin />
+    <MyBannerToolBarPlugin />
     <button onClick={() => {
       editor.update(() => $handleListInsertParagraph())
     }} >Exit List</button>
@@ -104,7 +120,7 @@ function MyToolbarPlugin() {
     const initialConfig = {
       namespace: 'MyEditor',
       theme,
-      nodes: [HeadingNode, ListNode, ListItemNode],
+      nodes: [HeadingNode, ListNode, ListItemNode, BannerNode],
       onError,
     };
     function handleSubmit() {
@@ -115,8 +131,9 @@ function MyToolbarPlugin() {
     return (
         <LexicalComposer initialConfig={initialConfig} className={'relative pl-2'}>
           <MyToolbarPlugin />
+          <BannerPlugin />
           <RichTextPlugin
-            contentEditable={<ContentEditable className='p-4 w-5/6 h-[500px] bg-gray-100 text-lime-400  mx-auto rounded border-gray-600 border-[35px] relative text-left overflow-y-scroll' />}
+            contentEditable={<ContentEditable className='p-4 w-5/6 h-[500px] bg-black text-lime-400  mx-auto rounded border-gray-600 border-[35px] relative text-left overflow-y-scroll' />}
             placeholder={<div className="rounded text-fuchsia-100 absolute top-40 left-0 right-0">Start Typing...</div>}
             ErrorBoundary={LexicalErrorBoundary}
           />
