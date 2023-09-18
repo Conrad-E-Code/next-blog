@@ -1,5 +1,5 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { $getSelection, $isRangeSelection, COMMAND_PRIORITY_LOW, COMMAND_PRIORITY_NORMAL, ElementNode, createCommand } from "lexical";
+import { $createParagraphNode, $getSelection, $isRangeSelection, $setSelection, COMMAND_PRIORITY_LOW, COMMAND_PRIORITY_NORMAL, ElementNode, createCommand, insertLineBreak } from "lexical";
 import {$setBlocksType} from "@lexical/selection"
 export class BannerNode extends ElementNode {
     constructor(key) {
@@ -13,6 +13,23 @@ export class BannerNode extends ElementNode {
     static clone(node) {
         return new BannerNode(node.__key);
     }
+
+    insertNewAfter(selection, blah) {
+        const newBlock = $createParagraphNode()
+        const direction = this.getDirection()
+        newBlock.setDirection(direction)
+        this.insertAfter(newBlock, blah)
+        newBlock.select()
+    }
+
+    // collapseAtStart() {
+    //     const para = $createParagraphNode()
+    //     const children = this.getChildren()
+    //     children.forEach( child => para.append(child))
+    //     this.replace(para)
+    //     return true
+
+    // }
 
     createDOM(config) {
         const element = document.createElement('div')
