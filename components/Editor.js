@@ -106,9 +106,9 @@ function MyToolbarPlugin() {
   const [editor] = useLexicalComposerContext()
 
   function handleLoadEditorState() {
-    const myState= {"root":{"children":[{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"This is my editor test","type":"text","version":1}],"direction":"ltr","format":"","indent":0,"type":"paragraph","version":1},{"children":[{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"list 1","type":"text","version":1}],"direction":"ltr","format":"","indent":0,"type":"listitem","version":1,"value":1},{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"list 2","type":"text","version":1}],"direction":"ltr","format":"","indent":0,"type":"listitem","version":1,"value":2}],"direction":"ltr","format":"","indent":0,"type":"list","version":1,"listType":"bullet","start":1,"tag":"ul"},{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"h1 test","type":"text","version":1}],"direction":"ltr","format":"","indent":0,"type":"heading","version":1,"tag":"h1"}],"direction":"ltr","format":"","indent":0,"type":"root","version":1}}
+    const myState= {"root":{"children":[{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"howdy","type":"text","version":1}],"direction":"ltr","format":"","indent":0,"type":"paragraph","version":1}],"direction":"ltr","format":"","indent":0,"type":"root","version":1}}
     editor.update(()=>{
-      editor.setEditorState(myState);
+      editor.setEditorState(editor.parseEditorState(myState));
     })
   }
 
@@ -121,7 +121,8 @@ function MyToolbarPlugin() {
     }} >Exit List</button>
 
 <button onClick={() => {editor.update(() => {
-  handleLoadEditorState()
+   handleLoadEditorState()
+
 })}}>LOAD EDITOR</button>
 
 
@@ -142,6 +143,8 @@ function MyToolbarPlugin() {
       console.log("EditorState:", editorState)
       console.log("stringify")
       console.log(JSON.stringify(editorState))
+
+
     }
 
 
@@ -156,11 +159,9 @@ function MyToolbarPlugin() {
             placeholder={<div className="rounded text-fuchsia-100 absolute top-40 left-0 right-0">Start Typing...</div>}
             ErrorBoundary={LexicalErrorBoundary}/>
           <HistoryPlugin />
-
           <MyAutoFocusPlugin />
-          <OnChangePlugin onChange={(lexState) => { setEditorState(lexState)}}/>
+          <OnChangePlugin onChange={(lexState) => { setEditorState(lexState.toJSON())}}/>
           <button onClick={handleSubmit}>SUBMIT</button>
-
         </LexicalComposer>
       );
     }
