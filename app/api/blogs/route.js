@@ -12,6 +12,6 @@ export const GET = async (req) => {
                 status: 200,
             });
     } catch (error) {
-        console.log(error, "GET error pjms route");
+        console.log(error, "GET ROUTE ERROR");
     }
 };
