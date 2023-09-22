@@ -1,5 +1,5 @@
 import { connectToDB } from "/utils/db";
-import ConXBlog from "/models/conXBlog";
+import ConXBlog from "/models/ConXBlog";
 // import bcrypt, {hash} from "bcrypt";
 
 export const POST = async (req) => {
@@ -9,10 +9,12 @@ export const POST = async (req) => {
         const blog = await ConXBlog.findOne({title});
         if (!blog) {
             console.log("Creating...");
+            console.log(contentJSON, title)
             const newBlog = new ConXBlog({
                 contentJSON,
                 title
             });
+            console.log("newBLog:", newBlog)
             await newBlog.save();
             return new Response(JSON.stringify(newBlog), { status: 201 });
         }
