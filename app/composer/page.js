@@ -9,6 +9,7 @@ const page = async () => {
   if (!session) {
     redirect("/api/auth/signin?callbackUrl=/composer")
   }
+  console.log(session)
   return (
     <div>
     <div className=''>

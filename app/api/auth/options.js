@@ -28,7 +28,7 @@ export const NextAuthOptions = {
           await connectToDB();
 
           // Find the user in the database based on the provided username
-          const user = await User.findOne({ username: credentials.username });
+          const user = await User.findOne({ name: credentials.username });
 
           if (!user) {
             // User not found, return null to indicate failed authentication
@@ -56,4 +56,26 @@ export const NextAuthOptions = {
       },
     }),
   ],
+  callbacks: {
+    async session({session, token, user}) {
+      console.log("sesstoken:", token)
+      console.log("sessuser:", user)
+      console.log("sesssession:", session)
+     session.accessToken = token.accessToken
+     session.user._id = token.id
+     console.log("session:", session)
+      return session
+    },
+    async jwt({ token, account, profile }) {
+      // Persist the OAuth access_token and or the user id to the token right after signin
+      console.log("jwt token:", token)
+      console.log("jwt account:", account)
+      console.log("jwt profile:", profile)
+      if (account) {
+        token.accessToken = account.access_token
+        token.id = account.providerAccountId
+      }
+      return token
+    }
+  }
 };

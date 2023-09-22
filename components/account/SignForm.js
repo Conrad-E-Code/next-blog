@@ -12,7 +12,6 @@ const SignForm = ({}) => {
   const router = useRouter();
   const { textClr } = useContext(Context);
   const [signForm, setSignForm] = useState({
-    username: "",
     password: "",
     name: "",
     email: ""
@@ -42,7 +41,6 @@ const SignForm = ({}) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          username: signForm.username,
           password: signForm.password,
           name: signForm.name,
           email: signForm.email
@@ -82,29 +80,7 @@ const SignForm = ({}) => {
         </div>
       )}
       <form className="flex flex-col gap-2" onSubmit={handleLogin}>
-        <label className="">
-          <span className="">Username</span>
-          <input
-            name="username"
-            value={signForm.username}
-            onChange={handleChange}
-            placeholder="Username"
-            required
-            className="form_input"
-          />
-        </label>
-        <label className="">
-          <span className="">Password:</span>
-          <input
-            name="password"
-            type="password"
-            value={signForm.password}
-            onChange={handleChange}
-            placeholder="Enter password"
-            required
-            className="form_input"
-          />
-        </label>
+
         <label className="">
           <span className="">Name:</span>
           <input
@@ -123,6 +99,18 @@ const SignForm = ({}) => {
             value={signForm.email}
             onChange={handleChange}
             placeholder="Enter email"
+            required
+            className="form_input"
+          />
+        </label>
+        <label className="">
+          <span className="">Password:</span>
+          <input
+            name="password"
+            type="password"
+            value={signForm.password}
+            onChange={handleChange}
+            placeholder="Enter password"
             required
             className="form_input"
           />
