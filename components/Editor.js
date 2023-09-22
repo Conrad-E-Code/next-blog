@@ -260,7 +260,7 @@ function Editor() {
             <ContentEditable className="p-4 w-5/6 h-[500px] bg-black text-lime-400  mx-auto rounded border-gray-600 border-[35px] relative text-left overflow-y-scroll" />
           }
           placeholder={
-            <div className="rounded text-fuchsia-100 absolute top-40 left-0 right-0">
+            <div className="rounded text-fuchsia-100">
               Start Typing...
             </div>
           }

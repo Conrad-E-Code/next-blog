@@ -14,6 +14,8 @@ const SignForm = ({}) => {
   const [signForm, setSignForm] = useState({
     username: "",
     password: "",
+    name: "",
+    email: ""
   });
 
   const handleChange = (event) => {
@@ -21,14 +23,14 @@ const SignForm = ({}) => {
     setSignForm((prevState) => ({ ...prevState, [name]: value }));
   };
 
-  const onCapChange = (value) => {
-    if (value) {
-      setCaptcha(true);
-    }
-    else {
-      setCaptcha(false);
-    }
-  }
+  // const onCapChange = (value) => {
+  //   if (value) {
+  //     setCaptcha(true);
+  //   }
+  //   else {
+  //     setCaptcha(false);
+  //   }
+  // }
 
   const handleLogin = async (e) => {
     console.log("YO")
@@ -42,6 +44,8 @@ const SignForm = ({}) => {
         body: JSON.stringify({
           username: signForm.username,
           password: signForm.password,
+          name: signForm.name,
+          email: signForm.email
         }),
       });
 
@@ -50,6 +54,7 @@ const SignForm = ({}) => {
       if (response.ok) {
         // Login successful, handle success scenario here (e.g., redirect)
         console.log("Login successful!");
+        console.log(data)
       } else {
         // Login failed, set the errors state to display error messages
         setErrors([data.error]);
@@ -67,7 +72,7 @@ const SignForm = ({}) => {
         <span>CREATE NEW ACCOUNT</span>
       </h1>
       <h1 className="text-trueblue font-extrabold text-2xl">
-        <span>Connects to MongoDB Atlas for user storage</span>
+        <span>Blog</span>
       </h1>
       {errors.length > 0 && (
         <div className="text-red-500">
@@ -89,13 +94,35 @@ const SignForm = ({}) => {
           />
         </label>
         <label className="">
-          <span className="">Password</span>
+          <span className="">Password:</span>
           <input
             name="password"
             type="password"
             value={signForm.password}
             onChange={handleChange}
-            placeholder="Password"
+            placeholder="Enter password"
+            required
+            className="form_input"
+          />
+        </label>
+        <label className="">
+          <span className="">Name:</span>
+          <input
+            name="name"
+            value={signForm.name}
+            onChange={handleChange}
+            placeholder="Enter name"
+            required
+            className="form_input"
+          />
+        </label>
+        <label className="">
+          <span className="">Email:</span>
+          <input
+            name="email"
+            value={signForm.email}
+            onChange={handleChange}
+            placeholder="Enter email"
             required
             className="form_input"
           />
