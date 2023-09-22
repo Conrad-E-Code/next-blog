@@ -208,7 +208,7 @@ function MyToolbarPlugin() {
   );
 }
 
-function Editor() {
+function Editor( {userId}) {
   const [blogTitle, setBlogTitle] = useState();
   const [editorState, setEditorState] = useState();
   const [errors, setErrors] = useState();
@@ -228,7 +228,7 @@ function Editor() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ title: blogTitle, contentJSON: editorState }),
+        body: JSON.stringify({ title: blogTitle, contentJSON: editorState, author: userId }),
       }).then((r) => {
         if (r.ok) {
           r.json().then((data) => {
@@ -260,7 +260,7 @@ function Editor() {
             <ContentEditable className="p-4 w-5/6 h-[500px] bg-black text-lime-400  mx-auto rounded border-gray-600 border-[35px] relative text-left overflow-y-scroll" />
           }
           placeholder={
-            <div className="rounded text-fuchsia-100 absolute top-40 left-0 right-0">
+            <div className="rounded text-fuchsia-100">
               Start Typing...
             </div>
           }

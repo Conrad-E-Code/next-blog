@@ -1,4 +1,4 @@
-import { Schema, model, models } from "mongoose";
+import { Schema, model, models, } from "mongoose";
 
 const ConXBlogSchema = new Schema({
   contentJSON: {
@@ -8,6 +8,10 @@ const ConXBlogSchema = new Schema({
   title: {
     type: String,
     required: [true, "Must have title"]
+  },
+  author: {
+    type: String,
+    required: [true, "Must be logged in to post"]
   }
 });
 

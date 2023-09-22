@@ -1,13 +1,18 @@
-import React from 'react'
-import Editor from './Editor'
+// Dont client here because of weird error
+import React from "react";
+import Editor from "./Editor";
 
-const EditorContainer = () => {
+const EditorContainer = async ({userId}) => {
+
+  //  if (!session) {
+  //   return (<div>Not Authorized</div>)
+  //  }
+  //  else
   return (
-    <div className='justify-center text-center bg-blue-600'>
-    <Editor />
+    <div className="justify-center text-center bg-blue-600">
+      <Editor userId={userId} />
+    </div>
+  );
+};
 
-    
-  </div>  )
-}
-
-export default EditorContainer
+export default EditorContainer;
