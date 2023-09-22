@@ -8,7 +8,11 @@ const ConXBlogSchema = new Schema({
   title: {
     type: String,
     required: [true, "Must have title"]
-  }
+  },
+  // userId: {
+  //   type: String,
+  //   required: [true, "Must be logged in to post"]
+  // }
 });
 
 const ConXBlog = models.ConXBlog || model("ConXBlog", ConXBlogSchema);
