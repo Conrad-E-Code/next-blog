@@ -208,7 +208,7 @@ function MyToolbarPlugin() {
   );
 }
 
-function Editor() {
+function Editor( {userId}) {
   const [blogTitle, setBlogTitle] = useState();
   const [editorState, setEditorState] = useState();
   const [errors, setErrors] = useState();
@@ -228,7 +228,7 @@ function Editor() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ title: blogTitle, contentJSON: editorState }),
+        body: JSON.stringify({ title: blogTitle, contentJSON: editorState, author: userId }),
       }).then((r) => {
         if (r.ok) {
           r.json().then((data) => {

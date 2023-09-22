@@ -2,7 +2,7 @@
 import React from "react";
 import Editor from "./Editor";
 
-const EditorContainer = async () => {
+const EditorContainer = async ({userId}) => {
 
   //  if (!session) {
   //   return (<div>Not Authorized</div>)
@@ -10,7 +10,7 @@ const EditorContainer = async () => {
   //  else
   return (
     <div className="justify-center text-center bg-blue-600">
-      <Editor />
+      <Editor userId={userId} />
     </div>
   );
 };

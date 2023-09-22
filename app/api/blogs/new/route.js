@@ -4,7 +4,7 @@ import ConXBlog from "/models/ConXBlog";
 
 
 export const POST = async (req) => {
-    const {contentJSON, title, user_id} = await req.json();
+    const {contentJSON, title, author} = await req.json();
     try{
         await connectToDB();
         const blog = await ConXBlog.findOne({title});
@@ -14,7 +14,7 @@ export const POST = async (req) => {
             const newBlog = new ConXBlog({
                 contentJSON,
                 title,
-                user: 
+                author
             });
             console.log("newBLog:", newBlog)
             await newBlog.save();

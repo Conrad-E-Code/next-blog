@@ -15,7 +15,7 @@ const page = async () => {
     <div className=''>
     Welcome! {session["user"]["name"]}
     </div>
-        <EditorContainer userEmail={session["user"]["email"]} />
+        <EditorContainer userId={session["user"]["_id"]} />
     </div>
   )
 }
