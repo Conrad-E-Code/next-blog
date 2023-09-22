@@ -1,21 +1,21 @@
 "use client";
 import React from 'react'
 import {useRouter} from "next/navigation"
-const NavBar = () => {
+const NavBar = ({session}) => {
     const router = useRouter()
     const Navlist = ["My Blogs", "Write", "Account"]
 
     const renderedLinks = Navlist.map((link)=>{
         function handleNavClick(link) {
             switch (link) {
-                case "My Blogs":
+                case "Blogs":
                     router.push(`/blogs`)  
                     break
                 case "Write":
                     router.push("/composer")
                     break
                 case "Account":
-                    router.push("dashboard")
+                    router.push("/dashboard")
                     break
             } 
         }
