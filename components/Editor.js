@@ -219,6 +219,7 @@ function Editor( {userId}) {
     onError,
   };
   function handleSubmit() {
+    // Pessimistic CLear Editor after fetch success
     console.log("Submitting...");
     console.log("EditorState:", editorState);
     console.log("Title:", blogTitle);
