@@ -1,6 +1,7 @@
 "use client";
 import React from 'react'
 import { useEffect, useState } from 'react'
+import Reader from './Reader';
 const BlogListGeneral = () => {
     const [serverBlogs, setServerBlogs] = useState([])
     useEffect(()=>{
@@ -11,9 +12,10 @@ const BlogListGeneral = () => {
   return (
     // add filter/search function
     <div>
-        {serverBlogs.map((blog)=> {
-        return (<div>{blog.title}</div>)
-        })}
+        {serverBlogs.length > 0 ? serverBlogs.map((blog)=> {
+        return (<Reader blog={blog} />)
+        }): null}
+
 
     </div>
   )

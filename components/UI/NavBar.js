@@ -3,7 +3,7 @@ import React from 'react'
 import {useRouter} from "next/navigation"
 const NavBar = ({session}) => {
     const router = useRouter()
-    const Navlist = ["My Blogs", "Write", "Account"]
+    const Navlist = ["Blogs", "Write", "Account"]
 
     const renderedLinks = Navlist.map((link)=>{
         function handleNavClick(link) {

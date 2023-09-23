@@ -4,15 +4,18 @@ import { useEffect, useState} from 'react';
 const UserBlogList = ({session}) => {
     const [serverBlogs, setServerBlogs] = useState([])
     useEffect(()=>{
-        fetch("/api/blogs")
+        fetch("/api/user/blogs")
         .then(r => r.json())
         .then(data => {setServerBlogs(data)})
     },[])
 
   return (
-    <div>UserBlogList
-        {serverBlogs.map(()=>{
-            return
+    <div>
+        {serverBlogs.map((blogObj)=>{
+            return(
+                <h1>{blogObj.title}</h1>
+                // Edit buttons (PATCH REQ)
+            )
         })}
     </div>
   )
