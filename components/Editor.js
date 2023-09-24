@@ -45,6 +45,7 @@ const theme = {
   },
   list: {
     ul: "list-disc list-inside",
+    ol: "list-decimal list-inside"
   },
   banner: "bg-red-400",
 
@@ -99,15 +100,23 @@ const MyListToolbarPlugin = () => {
     },
     COMMAND_PRIORITY_LOW
   );
+  editor.registerCommand(
+    INSERT_ORDERED_LIST_COMMAND,
+    () => {
+      insertList(editor, "number")
+      return true
+    }, COMMAND_PRIORITY_LOW
+  )
 
   function onClick(tag) {
     if (tag === "ol") {
+      console.log(INSERT_ORDERED_LIST_COMMAND)
       editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined);
-      return;
     }
+    else {
     console.log(INSERT_UNORDERED_LIST_COMMAND);
     editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined);
-  }
+  }}
   return (
     <div>
       {["ul", "ol"].map((tag) => {

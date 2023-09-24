@@ -61,6 +61,7 @@ function onError(error) {
 }
 
 function MyToolbarPlugin( {blog}) {
+  const [editing, setEditing] = useState(false)
   const [editor] = useLexicalComposerContext();
     useEffect(()=>{
         editor.update(() => {
@@ -68,9 +69,37 @@ function MyToolbarPlugin( {blog}) {
           });
     },[])
 
-
+function handleSaveChanges() {
+    const changes = JSON.stringify(editor.getEditorState())
+    console.log(changes)
+  fetch(`/api/blogs/${blog._id}`, { 
+    method: "PATCH",
+    headers: {
+      "content-type": "application/json"
+    },
+    body: JSON.stringify({contentJSON: changes})
+})
+.then( r => {
+  if (r.ok) {
+    r.json().then((data) => console.log(data))
+  } else {
+    r.json().then((err) => console.log({err: err}))
+    //handle errors
+  }
+})
+}
   return (
-null
+<>
+<button onClick={() =>{
+           editor.update(()=>{
+            setEditing(true)
+            editor.setEditable(true)
+           })     }} >Edit</button>
+
+           {editing ? <button onClick={ () => {
+            handleSaveChanges()
+           }}>Save Changes</button>: null}
+</>
   );
 }
 
@@ -110,6 +139,7 @@ function Reader( {userId, blog}) {
             setEditorState(JSON.stringify(lexState.toJSON()));
           }}
         />
+        
       </LexicalComposer>
   );
 }
