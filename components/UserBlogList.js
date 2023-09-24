@@ -1,7 +1,10 @@
 "use client";
 import React from 'react'
 import { useEffect, useState} from 'react';
+import Reader from './Reader';
+import { useRouter } from 'next/navigation';
 const UserBlogList = ({session}) => {
+    const router = useRouter()
     const [serverBlogs, setServerBlogs] = useState([])
     useEffect(()=>{
         fetch("/api/user/blogs")
@@ -12,9 +15,12 @@ const UserBlogList = ({session}) => {
   return (
     <div>
         {serverBlogs.map((blogObj)=>{
+            // console.log(blogObj)
             return(
-                <h1>{blogObj.title}</h1>
-                // Edit buttons (PATCH REQ)
+                <div>
+                <Reader blog={blogObj} />
+                </div>
+
             )
         })}
     </div>
