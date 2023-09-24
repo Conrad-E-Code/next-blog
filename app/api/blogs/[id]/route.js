@@ -1,5 +1,8 @@
 import { connectToDB } from "@/utils/db"
 import ConXBlog from "@/models/ConXBlog";
+import { getServerSession } from "next-auth";
+import { NextAuthOptions } from "@/app/api/auth/options";
+
 
 export const DELETE = async (req, { params }) => {
   try {
@@ -17,20 +20,29 @@ export const DELETE = async (req, { params }) => {
 };
 
 export const PATCH = async (req, { params }) => {
+    const { title, contentJSON} =
+  await req.json();
+  const session = await getServerSession(NextAuthOptions)
 //   console.log(params, "id from PARAMASSSSSSSSSSSS");
-  const { title, contentJSON} =
-    await req.json();
-  try {
-    await connectToDB();
-    const updateBlog = await ConXBlog.findByIdAndUpdate(params.id, {
-        title,
-        contentJSON
-    });
-    return new Response(JSON.stringify(updateBlog), { status: 202 });
-  } catch (error) {
-    console.log(error, "MY ERROR");
-    return new Response(JSON.stringify({ error: error }), {
-      status: 500,
-    });
-  }
+if (!session) {
+  return new Response(JSON.stringify({error: "unauthorized"}), {status: 401})
+}
+try {
+  await connectToDB();
+  const targetBlog = await ConXBlog.findById(params.id)
+  if (targetBlog["author"] === session.user._id) {
+  const updateBlog = await ConXBlog.findByIdAndUpdate(params.id, {
+      title,
+      contentJSON
+  });
+  return new Response(JSON.stringify(updateBlog), { status: 202 });
+} else {
+  return new Response(JSON.stringify({error: "unauthorized"}),{status: 401})
+}
+} catch (error) {
+  console.log(error, "MY ERROR");
+  return new Response(JSON.stringify({ error: error }), {
+    status: 500,
+  });
+}
 };
