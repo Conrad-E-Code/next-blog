@@ -1,11 +1,12 @@
 "use client";
-import React from 'react'
+import React, { useContext } from 'react'
 import { useEffect, useState} from 'react';
 import Reader from './Reader';
 import { useRouter } from 'next/navigation';
+import { Context } from '@/context/Context';
 const UserBlogList = ({session}) => {
     const router = useRouter()
-    const [serverBlogs, setServerBlogs] = useState([])
+    const {serverBlogs, setServerBlogs} = useContext(Context)
     useEffect(()=>{
         fetch("/api/user/blogs")
         .then(r => r.json())
@@ -18,7 +19,7 @@ const UserBlogList = ({session}) => {
             // console.log(blogObj)
             return(
                 <div>
-                <Reader blog={blogObj} />
+                <Reader blog={blogObj}/>
                 </div>
 
             )

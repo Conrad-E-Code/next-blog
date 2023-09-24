@@ -18,7 +18,10 @@ export default async function RootLayout({ children }) {
       <ContextProvider>
       <body className={inter.className}>
       <NavBar session={session}/>
-        {children}</body>
+      <div className='mt-14'>
+        {children}
+        </div>
+        </body>
         </ContextProvider>
     </html>
   )
