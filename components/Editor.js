@@ -6,6 +6,7 @@ import {
   $isRangeSelection,
   COMMAND_PRIORITY_LOW,
 } from "lexical";
+import LexicalTableOfContentsPlugin from "@lexical/react/LexicalTableOfContents";
 import { useEffect, useState } from "react";
 import { $generateHtmlFromNodes } from "@lexical/html";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
@@ -16,6 +17,13 @@ import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
 import { HeadingNode, $createHeadingNode } from "@lexical/rich-text";
+import {
+  TableNode,
+  TableCellNode,
+  INSERT_TABLE_COMMAND,
+  $insertTableRow,
+  $insertTableColumn,
+} from "@lexical/table";
 import {
   ListNode,
   ListItemNode,
@@ -46,7 +54,7 @@ const theme = {
   },
   list: {
     ul: "list-disc list-inside",
-    ol: "list-decimal list-inside"
+    ol: "list-decimal list-inside",
   },
   banner: "bg-red-400",
 
@@ -91,6 +99,8 @@ const MyHeaderPlugin = () => {
   );
 };
 
+const MyTableToolBarPlugin = () => {};
+
 const MyListToolbarPlugin = () => {
   const [editor] = useLexicalComposerContext();
   editor.registerCommand(
@@ -104,20 +114,21 @@ const MyListToolbarPlugin = () => {
   editor.registerCommand(
     INSERT_ORDERED_LIST_COMMAND,
     () => {
-      insertList(editor, "number")
-      return true
-    }, COMMAND_PRIORITY_LOW
-  )
+      insertList(editor, "number");
+      return true;
+    },
+    COMMAND_PRIORITY_LOW
+  );
 
   function onClick(tag) {
     if (tag === "ol") {
-      console.log(INSERT_ORDERED_LIST_COMMAND)
+      console.log(INSERT_ORDERED_LIST_COMMAND);
       editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined);
+    } else {
+      console.log(INSERT_UNORDERED_LIST_COMMAND);
+      editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined);
     }
-    else {
-    console.log(INSERT_UNORDERED_LIST_COMMAND);
-    editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined);
-  }}
+  }
   return (
     <div>
       {["ul", "ol"].map((tag) => {
@@ -212,28 +223,35 @@ function MyToolbarPlugin() {
           });
         }}
       >
-        LOAD EDITOR
+        LOAD EDITOR TEMPLATE
       </button>
     </div>
   );
 }
 
-function Editor( {userId}) {
+function Editor({ userId }) {
   const [blogTitle, setBlogTitle] = useState("");
   const [editorState, setEditorState] = useState();
   const [errors, setErrors] = useState();
   const initialConfig = {
     namespace: "MyEditor",
     theme,
-    nodes: [HeadingNode, ListNode, ListItemNode, BannerNode],
+    nodes: [
+      HeadingNode,
+      ListNode,
+      ListItemNode,
+      BannerNode,
+      TableNode,
+      TableCellNode,
+    ],
     onError,
   };
-   function handleSubmit() {
+  function handleSubmit() {
     // Pessimistic CLear Editor after fetch success
     console.log("Submitting...");
     console.log("EditorState:", editorState);
-    const parsedState = JSON.parse(editorState)
-    console.log(parsedState["root"]["children"][0]["children"][0]["text"])
+    const parsedState = JSON.parse(editorState);
+    console.log(parsedState["root"]["children"][0]["children"][0]["text"]);
     console.log("Title:", blogTitle);
     if (editorState && blogTitle) {
       fetch("/api/blogs/new", {
@@ -241,7 +259,11 @@ function Editor( {userId}) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ title: blogTitle, contentJSON: editorState, author: userId }),
+        body: JSON.stringify({
+          title: blogTitle,
+          contentJSON: editorState,
+          author: userId,
+        }),
       }).then((r) => {
         if (r.ok) {
           r.json().then((data) => {
@@ -254,27 +276,35 @@ function Editor( {userId}) {
     }
   }
   function handleFirstDraftSubmit() {
-    // Pessimistic CLear Editor after fetch success
     console.log("Submitting...");
     console.log("EditorState:", editorState);
-    console.log(editorState)
-    const parsedState = JSON.parse(editorState)
+    console.log(editorState);
+    const parsedState = JSON.parse(editorState);
     // console.log(parsedState["root"]["children"][0]["children"][0]["text"])
 
     if (!blogTitle) {
-        setBlogTitle(prev => prev =`SUPER TITLE ${Math.random()}`)}
-      
-      if (parsedState?.root?.children?.[0]?.children?.[0]?.text) {setBlogTitle(prev => prev = parsedState["root"]["children"][0]["children"][0]["text"])
-    } else setBlogTitle(prev => prev =`SUPER TITLE ${Math.random()}`) 
+      setBlogTitle((prev) => (prev = `SUPER TITLE ${Math.random()}`));
+    }
+
+    if (parsedState?.root?.children?.[0]?.children?.[0]?.text) {
+      setBlogTitle(
+        (prev) =>
+          (prev = parsedState["root"]["children"][0]["children"][0]["text"])
+      );
+    } else setBlogTitle((prev) => (prev = `SUPER TITLE ${Math.random()}`));
     if (editorState && blogTitle) {
       console.log("Title:", blogTitle);
-      console.log("SUBMITTTING DRAFT")
+      console.log("SUBMITTTING DRAFT");
       fetch("/api/blogs/new", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ title: blogTitle, contentJSON: editorState, author: userId }),
+        body: JSON.stringify({
+          title: blogTitle,
+          contentJSON: editorState,
+          author: userId,
+        }),
       }).then((r) => {
         if (r.ok) {
           r.json().then((data) => {
@@ -285,38 +315,70 @@ function Editor( {userId}) {
         }
       });
     } else {
-      console.log(editorState)
-      console.log(blogTitle)
+      console.log(editorState);
+      console.log(blogTitle);
     }
-
   }
 
-
   return (
-    <form onSubmit={(e) => {e.preventDefault()}}>
-      {errors? <div className=" bg-amber-400 text-[rgb(250,0,0)] font-bold"> ERROR: {errors}</div> : null}
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+      }}
+    >
+      {errors ? (
+        <div className=" bg-amber-400 text-[rgb(250,0,0)] font-bold">
+          {" "}
+          ERROR: {errors}
+        </div>
+      ) : null}
       <LexicalComposer initialConfig={initialConfig} className={"relative"}>
+        <LexicalTableOfContentsPlugin>
+          {(tableOfContents, editor) =>{
+            // Render your content that uses tableOfContents and editor here
+            console.log(tableOfContents, editor)
+            console.log(JSON.stringify(tableOfContents))
+            console.log(JSON.stringify(editor))
+            return (
+              <div className="table-of-contents">
+  <h2>Table of Contents</h2>
+  <ul>
+    {tableOfContents.map(([key, text, tag]) => (
+      <li key={key}>
+        <a href={`#header-clicker-${key}`}><div onClick={()=>{
+            console.log(editor.getElementByKey(key))
+            editor.getElementByKey(key).setAttribute("id", `heading-clicker-${key}`)
+
+        }}>{text}</div></a>
+      </li>
+    ))}
+  </ul>
+</div>
+
+            )
+          }
+          }
+        </LexicalTableOfContentsPlugin>
         <MyToolbarPlugin />
         <BannerPlugin />
-        <input
+        {/* <input
           required={true}
           className="w-5/6 px-10 "
           placeholder="Add Title"
           onChange={(e) => {
             setBlogTitle(e.target.value);
           }}
-        ></input>
+        ></input> */}
         <RichTextPlugin
           contentEditable={
-            <ContentEditable className="p-4 w-5/6 h-[500px] bg-black text-lime-400  mx-auto rounded border-gray-600 border-[35px] relative text-left overflow-y-scroll" />
+            <ContentEditable className="p-4 w-5/6 bg-black text-lime-400  mx-auto rounded border-gray-600 border-[35px] relative text-left" />
           }
           placeholder={
-            <div className="rounded text-fuchsia-100">
-              Start Typing...
-            </div>
+            <div className="rounded text-fuchsia-100">Start Typing...</div>
           }
           ErrorBoundary={LexicalErrorBoundary}
         />
+
         <HistoryPlugin />
         <MyAutoFocusPlugin />
         <OnChangePlugin
