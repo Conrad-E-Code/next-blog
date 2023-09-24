@@ -32,6 +32,7 @@ import {
   INSERT_BANNER_COMMAND,
 } from "./BannerPlugin";
 import { title } from "process";
+import { parse } from "path";
 const theme = {
   ltr: "text-left",
   text: {
@@ -218,7 +219,7 @@ function MyToolbarPlugin() {
 }
 
 function Editor( {userId}) {
-  const [blogTitle, setBlogTitle] = useState();
+  const [blogTitle, setBlogTitle] = useState("");
   const [editorState, setEditorState] = useState();
   const [errors, setErrors] = useState();
   const initialConfig = {
@@ -227,10 +228,12 @@ function Editor( {userId}) {
     nodes: [HeadingNode, ListNode, ListItemNode, BannerNode],
     onError,
   };
-  function handleSubmit() {
+   function handleSubmit() {
     // Pessimistic CLear Editor after fetch success
     console.log("Submitting...");
     console.log("EditorState:", editorState);
+    const parsedState = JSON.parse(editorState)
+    console.log(parsedState["root"]["children"][0]["children"][0]["text"])
     console.log("Title:", blogTitle);
     if (editorState && blogTitle) {
       fetch("/api/blogs/new", {
@@ -250,6 +253,44 @@ function Editor( {userId}) {
       });
     }
   }
+  function handleFirstDraftSubmit() {
+    // Pessimistic CLear Editor after fetch success
+    console.log("Submitting...");
+    console.log("EditorState:", editorState);
+    console.log(editorState)
+    const parsedState = JSON.parse(editorState)
+    // console.log(parsedState["root"]["children"][0]["children"][0]["text"])
+
+    if (!blogTitle) {
+        setBlogTitle(prev => prev =`SUPER TITLE ${Math.random()}`)}
+      
+      if (parsedState?.root?.children?.[0]?.children?.[0]?.text) {setBlogTitle(prev => prev = parsedState["root"]["children"][0]["children"][0]["text"])
+    } else setBlogTitle(prev => prev =`SUPER TITLE ${Math.random()}`) 
+    if (editorState && blogTitle) {
+      console.log("Title:", blogTitle);
+      console.log("SUBMITTTING DRAFT")
+      fetch("/api/blogs/new", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ title: blogTitle, contentJSON: editorState, author: userId }),
+      }).then((r) => {
+        if (r.ok) {
+          r.json().then((data) => {
+            console.log(data);
+          });
+        } else {
+          r.json().then((err) => console(err["error"]));
+        }
+      });
+    } else {
+      console.log(editorState)
+      console.log(blogTitle)
+    }
+
+  }
+
 
   return (
     <form onSubmit={(e) => {e.preventDefault()}}>
@@ -291,6 +332,15 @@ function Editor( {userId}) {
           }}
         >
           SUBMIT
+        </button>
+        <button
+          type="submit"
+          onClick={(e) => {
+            e.preventDefault();
+            handleFirstDraftSubmit();
+          }}
+        >
+          TEST
         </button>
       </LexicalComposer>
     </form>
