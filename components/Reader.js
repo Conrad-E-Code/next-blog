@@ -19,10 +19,6 @@ import { HeadingNode, $createHeadingNode } from "@lexical/rich-text";
 import {
   ListNode,
   ListItemNode,
-  INSERT_UNORDERED_LIST_COMMAND,
-  INSERT_ORDERED_LIST_COMMAND,
-  insertList,
-  $handleListInsertParagraph,
 } from "@lexical/list";
 import { $setBlocksType } from "@lexical/selection";
 import {
@@ -32,6 +28,10 @@ import {
   INSERT_BANNER_COMMAND,
 } from "./BannerPlugin";
 import { title } from "process";
+import DeleteButton from "./DeleteButton";
+import { Context } from "@/context/Context";
+import { useContext } from "react";
+import { onDelete } from "@/utils/onDelete";
 const theme = {
   ltr: "text-left",
   text: {
@@ -69,6 +69,7 @@ function MyToolbarPlugin( {blog}) {
           });
     },[])
 
+
 function handleSaveChanges() {
     const changes = JSON.stringify(editor.getEditorState())
     console.log(changes)
@@ -99,6 +100,8 @@ function handleSaveChanges() {
            {editing ? <button onClick={ () => {
             handleSaveChanges()
            }}>Save Changes</button>: null}
+
+<DeleteButton onDelete={() => {onDelete(blog)}} />
 </>
   );
 }
@@ -107,6 +110,7 @@ function Reader( {userId, blog}) {
   const [blogTitle, setBlogTitle] = useState();
   const [editorState, setEditorState] = useState();
   const [errors, setErrors] = useState();
+  const {isConfirmOpen} = useContext(Context)
   const initialConfig = {
     namespace: "MyEditor",
     theme,
@@ -117,14 +121,14 @@ function Reader( {userId, blog}) {
   };
 
 
-  return (
-      <LexicalComposer initialConfig={initialConfig} className={"relative"}>
+  return (isConfirmOpen ? <DeleteButton onDelete={() => {onDelete(blog)}} /> :
+ <LexicalComposer initialConfig={initialConfig} className={"relative z-1"}>
         <MyToolbarPlugin blog={blog} />
         <BannerPlugin />
         <h1 className={`text-xl font-semibold flex mx-auto text-center justify-center`}>{blog.title}</h1>
         <RichTextPlugin
           contentEditable={
-            <ContentEditable className="p-4 w-5/6 h-[500px] bg-black text-lime-400  mx-auto rounded border-gray-600 border-[35px] relative text-left overflow-y-scroll" />
+            <ContentEditable className="p-4 w-5/6 h-[500px] bg-black text-lime-400  mx-auto rounded border-gray-600 border-[35px] relative text-left overflow-y-scroll z-1" />
           }
           placeholder={
             <div className="rounded text-fuchsia-100">
