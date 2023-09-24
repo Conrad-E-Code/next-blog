@@ -106,6 +106,7 @@ function handleSaveChanges() {
 }
 
 function Reader( {userId, blog}) {
+  const [changeCount, setChangeCount] = useState(0)
   const [blogTitle, setBlogTitle] = useState();
   const [editorState, setEditorState] = useState();
   const [errors, setErrors] = useState();
@@ -113,7 +114,7 @@ function Reader( {userId, blog}) {
   const initialConfig = {
     namespace: "MyEditor",
     theme,
-    nodes: [HeadingNode, ListNode, ListItemNode, BannerNode],
+    nodes: [HeadingNode, ListNode, ListItemNode],
     onError,
     editable: false
 
@@ -123,11 +124,10 @@ function Reader( {userId, blog}) {
   return (<LexicalComposer initialConfig={initialConfig} className={"relative z-1 "}>
           <DeleteButton onDelete={() => {onDelete(blog, serverBlogs, setServerBlogs)}} />
         <MyToolbarPlugin blog={blog} />
-        <BannerPlugin />
         <h1 className={`text-xl font-semibold flex mx-auto text-center justify-center`}>{blog.title}</h1>
         <RichTextPlugin
           contentEditable={
-            <ContentEditable className=" opacity-10 p-4 w-5/6 h-[500px] bg-black text-lime-400  mx-auto rounded border-gray-600 border-[35px] relative text-left overflow-y-scroll z-1" />
+            <ContentEditable className=" p-4 w-5/6 h-[500px] bg-black text-lime-400  mx-auto rounded border-gray-600 border-[35px] relative text-left overflow-y-scroll z-1" />
           }
           placeholder={
             <div className="rounded text-fuchsia-100">
@@ -138,8 +138,13 @@ function Reader( {userId, blog}) {
         />
         <HistoryPlugin />
         <OnChangePlugin
-          onChange={(lexState) => {
+          onChange={(lexState) => { 
+            setChangeCount((prev)=>prev = prev + 1)
+            console.log(changeCount)
+
+            
             setEditorState(JSON.stringify(lexState.toJSON()));
+            //save draft to local storage
           }}
         />
       </LexicalComposer>
