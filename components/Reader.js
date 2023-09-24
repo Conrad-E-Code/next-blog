@@ -101,7 +101,6 @@ function handleSaveChanges() {
             handleSaveChanges()
            }}>Save Changes</button>: null}
 
-<DeleteButton onDelete={() => {onDelete(blog)}} />
 </>
   );
 }
@@ -110,7 +109,7 @@ function Reader( {userId, blog}) {
   const [blogTitle, setBlogTitle] = useState();
   const [editorState, setEditorState] = useState();
   const [errors, setErrors] = useState();
-  const {isConfirmOpen} = useContext(Context)
+  const {isConfirmOpen, serverBlogs, setServerBlogs} = useContext(Context)
   const initialConfig = {
     namespace: "MyEditor",
     theme,
@@ -121,14 +120,14 @@ function Reader( {userId, blog}) {
   };
 
 
-  return (isConfirmOpen ? <DeleteButton onDelete={() => {onDelete(blog)}} /> :
- <LexicalComposer initialConfig={initialConfig} className={"relative z-1"}>
+  return (<LexicalComposer initialConfig={initialConfig} className={"relative z-1 "}>
+          <DeleteButton onDelete={() => {onDelete(blog, serverBlogs, setServerBlogs)}} />
         <MyToolbarPlugin blog={blog} />
         <BannerPlugin />
         <h1 className={`text-xl font-semibold flex mx-auto text-center justify-center`}>{blog.title}</h1>
         <RichTextPlugin
           contentEditable={
-            <ContentEditable className="p-4 w-5/6 h-[500px] bg-black text-lime-400  mx-auto rounded border-gray-600 border-[35px] relative text-left overflow-y-scroll z-1" />
+            <ContentEditable className=" opacity-10 p-4 w-5/6 h-[500px] bg-black text-lime-400  mx-auto rounded border-gray-600 border-[35px] relative text-left overflow-y-scroll z-1" />
           }
           placeholder={
             <div className="rounded text-fuchsia-100">
@@ -143,7 +142,6 @@ function Reader( {userId, blog}) {
             setEditorState(JSON.stringify(lexState.toJSON()));
           }}
         />
-        
       </LexicalComposer>
   );
 }

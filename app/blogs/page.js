@@ -12,7 +12,7 @@ const page = async () => {
     
 
   return (
-    <div>
+    <div className='h-[100vh]'>
         <BlogListGeneral />
     </div>
   )
