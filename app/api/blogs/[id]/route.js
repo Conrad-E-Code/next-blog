@@ -5,15 +5,22 @@ import { NextAuthOptions } from "@/app/api/auth/options";
 
 
 export const DELETE = async (req, { params }) => {
+    const session = await getServerSession(NextAuthOptions)
   try {
 
     // console.log(params, "%%%%%%%%%%%%%%%%%%PARAMS%%%%%%%%%%%%%%%%%%%%%");
     await connectToDB();
+    const targetBlog = await ConXBlog.findById(params.id);
+    console.log("hello")
+    console.log(params.id)
+    if (targetBlog["author"] === session.user._id) {
     const deleteBlog = await ConXBlog.findByIdAndDelete(params.id);
     // console.log(deleteBlog, "DELETE BLOG");
     return new Response(JSON.stringify(deleteBlog), { status: 200,
 
-       });
+       });} else {
+        return new Response(JSON.stringify({error: "unauthorized"}),{status: 401})
+       }
   } catch (error) {
     console.log(error, "MY ERROR");
   }

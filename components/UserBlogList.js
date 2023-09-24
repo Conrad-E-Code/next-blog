@@ -13,7 +13,7 @@ const UserBlogList = ({session}) => {
     },[])
 
   return (
-    <div>
+    <div className='z-1'>
         {serverBlogs.map((blogObj)=>{
             // console.log(blogObj)
             return(
