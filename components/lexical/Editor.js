@@ -1,15 +1,8 @@
 "use client";
-import { Link as ScrollLink, Element } from 'react-scroll';
-import {
-  $createTextNode,
-  $getRoot,
-  $getSelection,
-  $isRangeSelection,
-  COMMAND_PRIORITY_LOW,
-} from "lexical";
+
+import MyToolbarPlugin from "./plugins/toolbar/MyToolbarPlugin";
 import LexicalTableOfContentsPlugin from "@lexical/react/LexicalTableOfContents";
 import { useEffect, useState } from "react";
-import { $generateHtmlFromNodes } from "@lexical/html";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
@@ -17,7 +10,7 @@ import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
-import { HeadingNode, $createHeadingNode } from "@lexical/rich-text";
+import { HeadingNode } from "@lexical/rich-text";
 import {
   TableNode,
   TableCellNode,
@@ -39,7 +32,7 @@ import {
   BannerNode,
   BannerPlugin,
   INSERT_BANNER_COMMAND,
-} from "./BannerPlugin";
+} from "./plugins/BannerPlugin";
 import { title } from "process";
 import { parse } from "path";
 const theme = {
@@ -70,170 +63,18 @@ const MyAutoFocusPlugin = () => {
 
   return null;
 };
-const MyHeaderPlugin = () => {
-  const [editor] = useLexicalComposerContext();
 
-  function onClick(tag) {
-    editor.update(() => {
-      const selection = $getSelection();
-      if ($isRangeSelection(selection)) {
-        $setBlocksType(selection, () => $createHeadingNode(tag));
-      }
-    });
-  }
-  return (
-    <div>
-      {["h1", "h2", "h3"].map((tag) => {
-        return (
-          <button
-            key={`header-button-${tag}`}
-            className="px-1 mx-4"
-            onClick={() => {
-              onClick(tag);
-            }}
-          >
-            Add {tag}
-          </button>
-        );
-      })}
-    </div>
-  );
-};
-
-const MyTableToolBarPlugin = () => {};
-
-const MyListToolbarPlugin = () => {
-  const [editor] = useLexicalComposerContext();
-  editor.registerCommand(
-    INSERT_UNORDERED_LIST_COMMAND,
-    () => {
-      insertList(editor, "bullet");
-      return true;
-    },
-    COMMAND_PRIORITY_LOW
-  );
-  editor.registerCommand(
-    INSERT_ORDERED_LIST_COMMAND,
-    () => {
-      insertList(editor, "number");
-      return true;
-    },
-    COMMAND_PRIORITY_LOW
-  );
-
-  function onClick(tag) {
-    if (tag === "ol") {
-      console.log(INSERT_ORDERED_LIST_COMMAND);
-      editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined);
-    } else {
-      console.log(INSERT_UNORDERED_LIST_COMMAND);
-      editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined);
-    }
-  }
-  return (
-    <div>
-      {["ul", "ol"].map((tag) => {
-        return (
-          <button
-            key={`header-button-${tag}`}
-            className="px-1 mx-4"
-            onClick={() => {
-              onClick(tag);
-            }}
-          >
-            Add {tag}
-          </button>
-        );
-      })}
-    </div>
-  );
-};
-
-const MyBannerToolBarPlugin = () => {
-  const [editor] = useLexicalComposerContext();
-  function onClick() {
-    console.log();
-    editor.dispatchCommand(INSERT_BANNER_COMMAND, undefined);
-  }
-
-  return <button onClick={onClick}> Insert Banner</button>;
-};
-
-// Catch any errors that occur during Lexical updates and log them
-// or throw them as needed. If you don't throw them, Lexical will
-// try to recover gracefully without losing user data.
-function onError(error) {
-  console.error(error);
-}
-
-function MyToolbarPlugin() {
-  const [editor] = useLexicalComposerContext();
-
-  function handleLoadEditorState() {
-    const myState = {
-      root: {
-        children: [
-          {
-            children: [
-              {
-                detail: 0,
-                format: 0,
-                mode: "normal",
-                style: "",
-                text: "howdy",
-                type: "text",
-                version: 1,
-              },
-            ],
-            direction: "ltr",
-            format: "",
-            indent: 0,
-            type: "paragraph",
-            version: 1,
-          },
-        ],
-        direction: "ltr",
-        format: "",
-        indent: 0,
-        type: "root",
-        version: 1,
-      },
-    };
-    editor.update(() => {
-      editor.setEditorState(editor.parseEditorState(myState));
-    });
-  }
-
-  return (
-    <div>
-      <MyHeaderPlugin />
-      <MyListToolbarPlugin />
-      <MyBannerToolBarPlugin />
-      <button
-        onClick={() => {
-          editor.update(() => $handleListInsertParagraph());
-        }}
-      >
-        Exit List
-      </button>
-
-      <button
-        onClick={() => {
-          editor.update(() => {
-            handleLoadEditorState();
-          });
-        }}
-      >
-        LOAD EDITOR TEMPLATE
-      </button>
-    </div>
-  );
-}
+// const MyTableToolBarPlugin = () => {};
 
 function Editor({ userId }) {
   const [blogTitle, setBlogTitle] = useState("");
   const [editorState, setEditorState] = useState();
   const [errors, setErrors] = useState();
+
+  function onError(error) {
+    console.error(error);
+  }
+
   const initialConfig = {
     namespace: "MyEditor",
     theme,
@@ -335,28 +176,30 @@ function Editor({ userId }) {
       ) : null}
       <LexicalComposer initialConfig={initialConfig} className={"relative"}>
         <LexicalTableOfContentsPlugin>
-          {(tableOfContents, editor) =>{
+          {(tableOfContents, editor) => {
             // Render your content that uses tableOfContents and editor here
-            console.log(tableOfContents, editor)
-            console.log(JSON.stringify(tableOfContents))
-            console.log(JSON.stringify(editor))
+            console.log(tableOfContents, editor);
+            console.log(JSON.stringify(tableOfContents));
+            console.log(JSON.stringify(editor));
             return (
               <div className="table-of-contents">
-  <h2>Table of Contents</h2>
-  <ul>
-    {tableOfContents.map(([key, text, tag]) => (
-      <li key={key}>
-        <div onClick={ () => {
-            editor.getElementByKey(key).scrollIntoView()}
-}>{text}</div>
-      </li>
-    ))}
-  </ul>
-</div>
-
-            )
-          }
-          }
+                <h2>Table of Contents</h2>
+                <ul>
+                  {tableOfContents.map(([key, text, tag]) => (
+                    <li key={key}>
+                      <div
+                        onClick={() => {
+                          editor.getElementByKey(key).scrollIntoView();
+                        }}
+                      >
+                        {text}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            );
+          }}
         </LexicalTableOfContentsPlugin>
         <MyToolbarPlugin />
         <BannerPlugin />
