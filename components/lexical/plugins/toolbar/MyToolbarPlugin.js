@@ -1,4 +1,5 @@
 "use client";
+import MyBannerToolbarPlugin from "@/components/lexical/plugins/toolbar/MyBannerToolbarPlugin"
 import MyListToolbarPlugin from "./MyListToolbarPlugin";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import MyHeaderPlugin from "./MyHeaderPlugin";
@@ -10,18 +11,6 @@ import MyHeaderPlugin from "./MyHeaderPlugin";
 //   $insertTableColumn,
 // } from "@lexical/table";
 import { $handleListInsertParagraph } from "@lexical/list";
-import { INSERT_BANNER_COMMAND } from "../BannerPlugin";
-
-const MyBannerToolBarPlugin = () => {
-  const [editor] = useLexicalComposerContext();
-  function onClick() {
-    console.log();
-    editor.dispatchCommand(INSERT_BANNER_COMMAND, undefined);
-  }
-
-  return <button onClick={onClick}> Insert Banner</button>;
-};
-
 
 export default function MyToolbarPlugin() {
   const [editor] = useLexicalComposerContext();
@@ -65,7 +54,7 @@ export default function MyToolbarPlugin() {
     <div>
       <MyHeaderPlugin />
       <MyListToolbarPlugin />
-      <MyBannerToolBarPlugin />
+      <MyBannerToolbarPlugin />
       <button
         onClick={() => {
           editor.update(() => $handleListInsertParagraph());

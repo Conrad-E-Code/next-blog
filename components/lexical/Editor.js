@@ -18,23 +18,8 @@ import {
   $insertTableRow,
   $insertTableColumn,
 } from "@lexical/table";
-import {
-  ListNode,
-  ListItemNode,
-  INSERT_UNORDERED_LIST_COMMAND,
-  INSERT_ORDERED_LIST_COMMAND,
-  insertList,
-  $handleListInsertParagraph,
-} from "@lexical/list";
-import { $setBlocksType } from "@lexical/selection";
-import {
-  $isBannerNode,
-  BannerNode,
-  BannerPlugin,
-  INSERT_BANNER_COMMAND,
-} from "./plugins/BannerPlugin";
-import { title } from "process";
-import { parse } from "path";
+import { ListNode, ListItemNode } from "@lexical/list";
+import { BannerNode, BannerPlugin } from "./plugins/BannerPlugin";
 const theme = {
   ltr: "text-left",
   text: {
@@ -71,9 +56,9 @@ function Editor({ userId }) {
   const [editorState, setEditorState] = useState();
   const [errors, setErrors] = useState();
 
-// Catch any errors that occur during Lexical updates and log them
-// or throw them as needed. If you don't throw them, Lexical will
-// try to recover gracefully without losing user data.
+  // Catch any errors that occur during Lexical updates and log them
+  // or throw them as needed. If you don't throw them, Lexical will
+  // try to recover gracefully without losing user data.
   function onError(error) {
     console.error(error);
   }
@@ -206,14 +191,6 @@ function Editor({ userId }) {
         </LexicalTableOfContentsPlugin>
         <MyToolbarPlugin />
         <BannerPlugin />
-        {/* <input
-          required={true}
-          className="w-5/6 px-10 "
-          placeholder="Add Title"
-          onChange={(e) => {
-            setBlogTitle(e.target.value);
-          }}
-        ></input> */}
         <RichTextPlugin
           contentEditable={
             <ContentEditable className="p-4 w-5/6 bg-black text-lime-400  mx-auto rounded border-gray-600 border-[35px] relative text-left" />
