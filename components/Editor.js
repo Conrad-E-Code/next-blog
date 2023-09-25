@@ -1,4 +1,5 @@
 "use client";
+import { Link as ScrollLink, Element } from 'react-scroll';
 import {
   $createTextNode,
   $getRoot,
@@ -345,11 +346,9 @@ function Editor({ userId }) {
   <ul>
     {tableOfContents.map(([key, text, tag]) => (
       <li key={key}>
-        <a href={`#header-clicker-${key}`}><div onClick={()=>{
-            console.log(editor.getElementByKey(key))
-            editor.getElementByKey(key).setAttribute("id", `heading-clicker-${key}`)
-
-        }}>{text}</div></a>
+        <div onClick={ () => {
+            editor.getElementByKey(key).scrollIntoView()}
+}>{text}</div>
       </li>
     ))}
   </ul>
