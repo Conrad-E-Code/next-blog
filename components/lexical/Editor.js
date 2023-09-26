@@ -1,5 +1,5 @@
 "use client";
-
+import TableOfContentsPlugin from "./plugins/TableOfContentsPlugin";
 import MyToolbarPlugin from "./plugins/toolbar/MyToolbarPlugin";
 import LexicalTableOfContentsPlugin from "@lexical/react/LexicalTableOfContents";
 import { useEffect, useState } from "react";
@@ -11,6 +11,8 @@ import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
 import { HeadingNode } from "@lexical/rich-text";
+import { useContext } from "react";
+import { Context } from "@/context/Context";
 import {
   TableNode,
   TableCellNode,
@@ -20,6 +22,7 @@ import {
 } from "@lexical/table";
 import { ListNode, ListItemNode } from "@lexical/list";
 import { BannerNode, BannerPlugin } from "./plugins/BannerPlugin";
+// import { getParentElement } from "lexical/LexicalUtils";
 const theme = {
   ltr: "text-left",
   text: {
@@ -32,26 +35,47 @@ const theme = {
     h3: "text-xl",
   },
   list: {
-    ul: "list-disc list-inside",
-    ol: "list-decimal list-inside",
-  },
+    ul: "list-disc list-inside text-left",
+    ol: "list-decimal list-inside text-left"},
   banner: "bg-red-400",
 
   // Theme styling goes here
 };
-const MyAutoFocusPlugin = () => {
+const MyAutoFocusPlugin = ({editorState, setEditorState}) => {
+  const {userInsideList, setUserInsideList} = useContext(Context)
   const [editor] = useLexicalComposerContext();
   useEffect(() => {
     // Focus the editor when the effect fires!
     editor.focus();
   }, [editor]);
 
-  return null;
+  function parentIsListOrItem(selection) {
+    const childKey = selection.anchor.key
+    const childElement = editor.getElementByKey(childKey)
+    const tagCheck = childElement.parentElement.tagName
+    console.log(tagCheck)
+    if (tagCheck.includes("UL") || tagCheck.includes("LI") || tagCheck.includes("OL")) {
+      console.log(true)
+      setUserInsideList(true)
+      return true 
+    } else {
+      setUserInsideList(false)
+      console.log(false)
+      return false
+    }
+  }
+
+  return         <OnChangePlugin
+  onChange={(lexState) => { console.log(lexState)
+    parentIsListOrItem(lexState._selection)
+    setEditorState(JSON.stringify(lexState.toJSON()));
+  }}
+/>;
 };
 
 // const MyTableToolBarPlugin = () => {};
 
-function Editor({ userId }) {
+function Editor({userId }) {
   const [blogTitle, setBlogTitle] = useState("");
   const [editorState, setEditorState] = useState();
   const [errors, setErrors] = useState();
@@ -70,12 +94,15 @@ function Editor({ userId }) {
       HeadingNode,
       ListNode,
       ListItemNode,
-      BannerNode,
+      // BannerNode,
       TableNode,
       TableCellNode,
     ],
     onError,
   };
+
+
+
   function handleSubmit() {
     // Pessimistic CLear Editor after fetch success
     console.log("Submitting...");
@@ -166,31 +193,16 @@ function Editor({ userId }) {
         <LexicalTableOfContentsPlugin>
           {(tableOfContents, editor) => {
             // Render your content that uses tableOfContents and editor here
-            console.log(tableOfContents, editor);
-            console.log(JSON.stringify(tableOfContents));
-            console.log(JSON.stringify(editor));
+            // console.log(tableOfContents, editor);
+            // console.log(JSON.stringify(tableOfContents));
+            // console.log(JSON.stringify(editor));
             return (
-              <div className="table-of-contents">
-                <h2>Table of Contents</h2>
-                <ul>
-                  {tableOfContents.map(([key, text, tag]) => (
-                    <li key={key}>
-                      <div
-                        onClick={() => {
-                          editor.getElementByKey(key).scrollIntoView();
-                        }}
-                      >
-                        {text}
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              <TableOfContentsPlugin tableOfContents={tableOfContents} initialShowHideBoolean={false} />
             );
           }}
         </LexicalTableOfContentsPlugin>
         <MyToolbarPlugin />
-        <BannerPlugin />
+        {/* <BannerPlugin /> */}
         <RichTextPlugin
           contentEditable={
             <ContentEditable className="p-4 w-5/6 bg-black text-lime-400  mx-auto rounded border-gray-600 border-[35px] relative text-left" />
@@ -202,12 +214,7 @@ function Editor({ userId }) {
         />
 
         <HistoryPlugin />
-        <MyAutoFocusPlugin />
-        <OnChangePlugin
-          onChange={(lexState) => {
-            setEditorState(JSON.stringify(lexState.toJSON()));
-          }}
-        />
+        <MyAutoFocusPlugin editorState={editorState} setEditorState={setEditorState} />
         <button
           type="submit"
           onClick={(e) => {
