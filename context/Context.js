@@ -5,6 +5,10 @@ export const ContextProvider = ({ children }) => {
   //user
   const [user, setUser] = useState(null);
   const [errors, setErrors] = useState([])
+
+  // check for lexical to see if the user is inside a list
+  const [userInsideList, setUserInsideList] = useState(false)
+  
   
 // SERVER BLOGS FOR USERBLOGLIST
 const [serverBlogs, setServerBlogs] = useState([])
@@ -21,7 +25,9 @@ const [serverBlogs, setServerBlogs] = useState([])
         isConfirmOpen,
         setIsConfirmOpen,
         serverBlogs,
-        setServerBlogs
+        setServerBlogs,
+        userInsideList,
+        setUserInsideList
       }}>
       {children}
     </Context.Provider>

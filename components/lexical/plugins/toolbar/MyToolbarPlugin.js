@@ -3,6 +3,10 @@ import MyBannerToolbarPlugin from "@/components/lexical/plugins/toolbar/MyBanner
 import MyListToolbarPlugin from "./MyListToolbarPlugin";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import MyHeaderPlugin from "./MyHeaderPlugin";
+import {AiOutlineOrderedList, AiOutlineUnorderedList, AiOutlineFileImage, } from "react-icons/ai"
+import {BsCodeSlash} from "react-icons/bs"
+import {CgLink} from "react-icons/cg"
+
 // import {
 //   TableNode,
 //   TableCellNode,
@@ -10,10 +14,11 @@ import MyHeaderPlugin from "./MyHeaderPlugin";
 //   $insertTableRow,
 //   $insertTableColumn,
 // } from "@lexical/table";
-import { $handleListInsertParagraph } from "@lexical/list";
+
 
 export default function MyToolbarPlugin() {
   const [editor] = useLexicalComposerContext();
+
 
   function handleLoadEditorState() {
     const myState = {
@@ -50,20 +55,15 @@ export default function MyToolbarPlugin() {
     });
   }
 
+
   return (
-    <div>
+    <div className="flex">
       <MyHeaderPlugin />
       <MyListToolbarPlugin />
-      <MyBannerToolbarPlugin />
-      <button
-        onClick={() => {
-          editor.update(() => $handleListInsertParagraph());
-        }}
-      >
-        Exit List
-      </button>
+      {/* <MyBannerToolbarPlugin /> */}
 
-      <button
+      <div
+      title="Load editor template"
         onClick={() => {
           editor.update(() => {
             handleLoadEditorState();
@@ -71,7 +71,15 @@ export default function MyToolbarPlugin() {
         }}
       >
         LOAD EDITOR TEMPLATE
-      </button>
+      </div>
     </div>
   );
 }
+
+
+// <FaArrowCircleLeft
+// onClick={prevSlide}
+// style={{color: Colors[textClr]}}
+// className={`z-40 cursor-pointer absolute left-[20px] top-[35px] ease-in-out duration-1000`}
+// size={50}
+// />
