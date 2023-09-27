@@ -1,4 +1,5 @@
 "use client";
+import FormatOptionsPlugin from "./FormatOptionsPlugin";
 import MyBannerToolbarPlugin from "@/components/lexical/plugins/toolbar/MyBannerToolbarPlugin"
 import MyListToolbarPlugin from "./MyListToolbarPlugin";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
@@ -57,9 +58,10 @@ export default function MyToolbarPlugin() {
 
 
   return (
-    <div className="flex">
+    <div className="flex gap-1 w-fit mx-auto py-2">
       <MyHeaderPlugin />
       <MyListToolbarPlugin />
+      <FormatOptionsPlugin />
       {/* <MyBannerToolbarPlugin /> */}
 
       <div

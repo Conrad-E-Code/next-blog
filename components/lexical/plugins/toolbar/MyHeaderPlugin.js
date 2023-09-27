@@ -17,7 +17,7 @@ export default function MyHeaderPlugin() {
     });
   }
   return (
-    <div className="flex flex-col">
+    <div className="flex gap-1">
       {["h1", "h2", "h3"].map((tag) => {
                 function headingType(tag) {
                     switch (tag) {
