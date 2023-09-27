@@ -11,6 +11,7 @@ const HistoryToolbarPlugin = () => {
       command: "undo",
       icon: (
         <BiUndo
+          title="Undo (Ctrl + Z)"
           onClick={() => {
             editor.dispatchCommand(UNDO_COMMAND);
           }}
@@ -18,10 +19,18 @@ const HistoryToolbarPlugin = () => {
         />
       ),
     },
-    { command: "redo", icon: <BiRedo
-    onClick={() => {
-        editor.dispatchCommand(REDO_COMMAND)
-    }} size={optionSize} /> },
+    {
+      command: "redo",
+      icon: (
+        <BiRedo
+          title="Redo (Ctrl + Y)"
+          onClick={() => {
+            editor.dispatchCommand(REDO_COMMAND);
+          }}
+          size={optionSize}
+        />
+      ),
+    },
   ];
   return (
     <div className="flex">
