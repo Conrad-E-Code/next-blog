@@ -28,6 +28,7 @@ const theme = {
   text: {
     bold: "font-boldest",
     italic: "italic",
+    underline: "underline"
   },
   heading: {
     h1: "text-3xl font-bold",
@@ -42,7 +43,8 @@ const theme = {
   // Theme styling goes here
 };
 const MyAutoFocusPlugin = ({editorState, setEditorState}) => {
-  const {userInsideList, setUserInsideList} = useContext(Context)
+  const {userInsideList, setUserInsideList, currentEditorFormat, setCurrentEditorFormat} = useContext(Context)
+
   const [editor] = useLexicalComposerContext();
   useEffect(() => {
     // Focus the editor when the effect fires!
@@ -50,25 +52,26 @@ const MyAutoFocusPlugin = ({editorState, setEditorState}) => {
   }, [editor]);
 
   function parentIsListOrItem(selection) {
-    const childKey = selection.anchor.key
+    const childKey = selection?.anchor.key
     const childElement = editor.getElementByKey(childKey)
     const tagCheck = childElement.parentElement.tagName
-    console.log(tagCheck)
+    // console.log(tagCheck)
     if (tagCheck.includes("UL") || tagCheck.includes("LI") || tagCheck.includes("OL")) {
-      console.log(true)
+      // console.log(true)
       setUserInsideList(true)
       return true 
     } else {
       setUserInsideList(false)
-      console.log(false)
+      // console.log(false)
       return false
     }
   }
 
   return         <OnChangePlugin
-  onChange={(lexState) => { console.log(lexState)
+  onChange={(lexState) => { console.log(JSON.stringify(lexState))
     parentIsListOrItem(lexState._selection)
     setEditorState(JSON.stringify(lexState.toJSON()));
+    setCurrentEditorFormat(lexState._selection.format)
   }}
 />;
 };

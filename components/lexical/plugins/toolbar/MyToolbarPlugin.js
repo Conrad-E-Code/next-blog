@@ -1,4 +1,5 @@
 "use client";
+import FormatOptionsPlugin from "./FormatOptionsPlugin";
 import MyBannerToolbarPlugin from "@/components/lexical/plugins/toolbar/MyBannerToolbarPlugin"
 import MyListToolbarPlugin from "./MyListToolbarPlugin";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
@@ -6,6 +7,7 @@ import MyHeaderPlugin from "./MyHeaderPlugin";
 import {AiOutlineOrderedList, AiOutlineUnorderedList, AiOutlineFileImage, } from "react-icons/ai"
 import {BsCodeSlash} from "react-icons/bs"
 import {CgLink} from "react-icons/cg"
+import HistoryToolbarPlugin from "./HistoryToolbarPlugin";
 
 // import {
 //   TableNode,
@@ -57,9 +59,11 @@ export default function MyToolbarPlugin() {
 
 
   return (
-    <div className="flex">
+    <div className="flex gap-1 w-fit mx-auto py-2">
       <MyHeaderPlugin />
       <MyListToolbarPlugin />
+      <FormatOptionsPlugin />
+      <HistoryToolbarPlugin />
       {/* <MyBannerToolbarPlugin /> */}
 
       <div
