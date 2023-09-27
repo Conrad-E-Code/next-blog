@@ -42,7 +42,7 @@ export default function MyListToolbarPlugin() {
     }
   }
   return (
-    <div className="flex gap-1">
+    <div className="flex">
       {/* identify list */}
       {["ul", "ol"].map((tag) => {
         function listType(tag) {
@@ -58,14 +58,17 @@ export default function MyListToolbarPlugin() {
         const thisList = listType(tag);
         if (thisList && thisList === "Number List")
           return (
-            <AiOutlineOrderedList
-              size={25}
-              title={`insert ${thisList}`}
-              key={`header-button-${tag}`}
-              onClick={() => {
-                onClick(tag);
-              }}
-            />
+            <div className="p-1">
+              {" "}
+              <AiOutlineOrderedList
+                size={25}
+                title={`insert ${thisList}`}
+                key={`header-button-${tag}`}
+                onClick={() => {
+                  onClick(tag);
+                }}
+              />{" "}
+            </div>
             //   <button
             //     title={`insert ${thisList}`}
             //     key={`header-button-${tag}`}
@@ -77,22 +80,29 @@ export default function MyListToolbarPlugin() {
           );
         else if (thisList && thisList === "Bullet List") {
           return (
-            <AiOutlineUnorderedList
-              title={`insert ${thisList}`}
-              key={`header-button-${tag}`}
-              onClick={() => {
-                onClick(tag);
-              }}
-              size={25}
-            />
+            <div className="p-1">
+              {" "}
+              <AiOutlineUnorderedList
+                title={`insert ${thisList}`}
+                key={`header-button-${tag}`}
+                onClick={() => {
+                  onClick(tag);
+                }}
+                size={25}
+              />{" "}
+            </div>
           );
         }
       })}
       {userInsideList ? (
-        <LuListEnd size={25} title="Exit List (Insert Paragraph)"           onClick={() => {
+       <div className="p-1"> <LuListEnd
+          size={25}
+          title="Exit List (Insert Paragraph)"
+          onClick={() => {
             // parentIsListOrItem()
             editor.update(() => $handleListInsertParagraph());
-          }} />
+          }}
+        /></div>
       ) : null}
     </div>
   );

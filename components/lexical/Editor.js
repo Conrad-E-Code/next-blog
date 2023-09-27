@@ -52,7 +52,7 @@ const MyAutoFocusPlugin = ({editorState, setEditorState}) => {
   }, [editor]);
 
   function parentIsListOrItem(selection) {
-    const childKey = selection.anchor.key
+    const childKey = selection?.anchor.key
     const childElement = editor.getElementByKey(childKey)
     const tagCheck = childElement.parentElement.tagName
     // console.log(tagCheck)
@@ -68,7 +68,7 @@ const MyAutoFocusPlugin = ({editorState, setEditorState}) => {
   }
 
   return         <OnChangePlugin
-  onChange={(lexState) => { console.log(lexState._selection.format)
+  onChange={(lexState) => { console.log(JSON.stringify(lexState))
     parentIsListOrItem(lexState._selection)
     setEditorState(JSON.stringify(lexState.toJSON()));
     setCurrentEditorFormat(lexState._selection.format)

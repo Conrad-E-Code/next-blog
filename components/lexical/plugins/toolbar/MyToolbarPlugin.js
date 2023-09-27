@@ -7,6 +7,7 @@ import MyHeaderPlugin from "./MyHeaderPlugin";
 import {AiOutlineOrderedList, AiOutlineUnorderedList, AiOutlineFileImage, } from "react-icons/ai"
 import {BsCodeSlash} from "react-icons/bs"
 import {CgLink} from "react-icons/cg"
+import HistoryToolbarPlugin from "./HistoryToolbarPlugin";
 
 // import {
 //   TableNode,
@@ -62,6 +63,7 @@ export default function MyToolbarPlugin() {
       <MyHeaderPlugin />
       <MyListToolbarPlugin />
       <FormatOptionsPlugin />
+      <HistoryToolbarPlugin />
       {/* <MyBannerToolbarPlugin /> */}
 
       <div

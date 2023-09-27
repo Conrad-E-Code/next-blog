@@ -17,13 +17,13 @@ export default function MyHeaderPlugin() {
     });
   }
   return (
-    <div className="flex gap-1">
+    <div className="flex">
       {["h1", "h2", "h3"].map((tag) => {
                 function headingType(tag) {
                     switch (tag) {
-                        case "h1": return <FaHeading  title="Insert Large Heading" key={`header-button-${tag}`} size={25} onClick={() => {onClick(tag)}}/>
-                        case "h2": return <LuHeading2 title="Insert Medium Heading" key={`header-button-${tag}`} size={25} onClick={() => {onClick(tag)}}/>
-                        case "h3": return <LuHeading3 title="Insert Small Heading" key={`header-button-${tag}`} size={25} onClick={() => {onClick(tag)}}/>
+                        case "h1": return <div className={"p-1"}><FaHeading  title="Insert Large Heading" key={`header-button-${tag}`} size={25} onClick={() => {onClick(tag)}}/></div>
+                        case "h2": return <div className={"p-1"}><LuHeading2 title="Insert Medium Heading" key={`header-button-${tag}`} size={25} onClick={() => {onClick(tag)}}/></div>
+                        case "h3": return <div className={"p-1"}><LuHeading3 title="Insert Small Heading" key={`header-button-${tag}`} size={25} onClick={() => {onClick(tag)}}/></div>
                         default: return "Heading"
                     }
                 }
