@@ -106,7 +106,7 @@ function Editor({ userId, editable, blog }) {
         {/* <BannerPlugin /> */}
         <RichTextPlugin
           contentEditable={
-            <ContentEditable className="p-4 w-5/6 bg-black text-lime-400  mx-auto rounded border-gray-600 border-[35px] relative text-left" />
+            <ContentEditable className="p-4 w-5/6 bg-slate-300 text-black  mx-auto rounded border-gray-600 border-[2px] relative text-left" />
           }
           placeholder={
             <div className="rounded text-fuchsia-100">Start Typing...</div>

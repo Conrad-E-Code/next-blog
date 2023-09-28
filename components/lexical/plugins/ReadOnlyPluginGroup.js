@@ -10,7 +10,7 @@ const ReadOnlyPluginGroup = ({ blog }) => {
       });
     }
   }, []);
-  return <div>ReadOnlyPluginGroup</div>;
+  return <div>Edit/Delete</div>;
 };
 
 export default ReadOnlyPluginGroup;
