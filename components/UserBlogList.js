@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Reader from "./lexical/Reader";
 import { useRouter } from "next/navigation";
 import { Context } from "@/context/Context";
+import EditorContainer from "./EditorContainer";
 const UserBlogList = ({ session }) => {
   const router = useRouter();
   const { serverBlogs, setServerBlogs } = useContext(Context);
@@ -21,7 +22,7 @@ const UserBlogList = ({ session }) => {
         // console.log(blogObj)
         return (
           <div>
-            <Reader blog={blogObj} />
+            <EditorContainer editable={false} blog={blogObj} />
           </div>
         );
       })}

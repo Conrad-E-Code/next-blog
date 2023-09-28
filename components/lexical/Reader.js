@@ -1,13 +1,9 @@
 "use client";
-import {
-  $createTextNode,
-  $getRoot,
-  $getSelection,
-  $isRangeSelection,
-  COMMAND_PRIORITY_LOW,
-} from "lexical";
+import TreeViewPlugin from "./plugins/TreeViewPlugin";
+import TableOfContentsPlugin from "./plugins/TableOfContentsPlugin";
+import MyToolbarPlugin from "./plugins/toolbar/MyToolbarPlugin";
+import LexicalTableOfContentsPlugin from "@lexical/react/LexicalTableOfContents";
 import { useEffect, useState } from "react";
-import { $generateHtmlFromNodes } from "@lexical/html";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
@@ -15,25 +11,27 @@ import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
-import { HeadingNode, $createHeadingNode } from "@lexical/rich-text";
-import { ListNode, ListItemNode } from "@lexical/list";
-import { $setBlocksType } from "@lexical/selection";
-import {
-  $isBannerNode,
-  BannerNode,
-  BannerPlugin,
-  INSERT_BANNER_COMMAND,
-} from "./plugins/BannerPlugin";
-import { title } from "process";
-import DeleteButton from "../DeleteButton";
-import { Context } from "@/context/Context";
+import { HeadingNode } from "@lexical/rich-text";
 import { useContext } from "react";
-import { onDelete } from "@/utils/onDelete";
+import { Context } from "@/context/Context";
+import {
+  TableNode,
+  TableCellNode,
+  INSERT_TABLE_COMMAND,
+  $insertTableRow,
+  $insertTableColumn,
+} from "@lexical/table";
+import { ListNode, ListItemNode } from "@lexical/list";
+import { BannerNode, BannerPlugin } from "./plugins/BannerPlugin";
+import { ImageNode } from "./nodes/ImageNode/ImageNode";
+import ImagesPlugin from "./plugins/ImagePlugin";
+// import { getParentElement } from "lexical/LexicalUtils";
 const theme = {
   ltr: "text-left",
   text: {
     bold: "font-boldest",
     italic: "italic",
+    underline: "underline"
   },
   heading: {
     h1: "text-3xl font-bold",
@@ -41,120 +39,154 @@ const theme = {
     h3: "text-xl",
   },
   list: {
-    ul: "list-disc list-inside",
-  },
+    ul: "list-disc list-inside text-left",
+    ol: "list-decimal list-inside text-left"},
   banner: "bg-red-400",
+  image: "editor-image"
 
   // Theme styling goes here
 };
+const MyAutoFocusPlugin = ({editorState, setEditorState, blog}) => {
+  const {userInsideList, setUserInsideList, currentEditorFormat, setCurrentEditorFormat} = useContext(Context)
 
-// Catch any errors that occur during Lexical updates and log them
-// or throw them as needed. If you don't throw them, Lexical will
-// try to recover gracefully without losing user data.
-function onError(error) {
-  console.error(error);
-}
-
-function MyToolbarPlugin({ blog }) {
-  const [editing, setEditing] = useState(false);
   const [editor] = useLexicalComposerContext();
   useEffect(() => {
     editor.update(() => {
       editor.setEditorState(editor.parseEditorState(blog.contentJSON));
     });
   }, []);
+  useEffect(() => {
+    // Focus the editor when the effect fires!
+    editor.focus();
+  }, [editor]);
 
-  function handleSaveChanges() {
-    const changes = JSON.stringify(editor.getEditorState());
-    console.log(changes);
-    fetch(`/api/blogs/${blog._id}`, {
-      method: "PATCH",
-      headers: {
-        "content-type": "application/json",
-      },
-      body: JSON.stringify({ contentJSON: changes }),
-    }).then((r) => {
-      if (r.ok) {
-        r.json().then((data) => console.log(data));
-      } else {
-        r.json().then((err) => console.log({ err: err }));
-        //handle errors
-      }
-    });
+  function parentIsListOrItem(selection) {
+    const childKey = selection?.anchor?.key
+    const childElement = editor.getElementByKey(childKey)
+    const tagCheck = childElement?.parentElement?.tagName
+    // console.log(tagCheck)
+    if (tagCheck?.includes("UL") || tagCheck?.includes("LI") || tagCheck?.includes("OL")) {
+      // console.log(true)
+      setUserInsideList(true)
+      return true 
+    } else {
+      setUserInsideList(false)
+      // console.log(false)
+      return false
+    }
   }
-  return (
-    <>
-      <button
-        onClick={() => {
-          editor.update(() => {
-            setEditing(true);
-            editor.setEditable(true);
-          });
-        }}
-      >
-        Edit
-      </button>
 
-      {editing ? (
-        <button
-          onClick={() => {
-            handleSaveChanges();
-          }}
-        >
-          Save Changes
-        </button>
-      ) : null}
-    </>
-  );
-}
+  return         <OnChangePlugin
+  onChange={(lexState) => { console.log(JSON.stringify(lexState))
+    parentIsListOrItem(lexState._selection)
+    setEditorState(JSON.stringify(lexState.toJSON()));
+    setCurrentEditorFormat(lexState?._selection?.format)
+  }}
+/>;
+};
 
-function Reader({ userId, blog }) {
-  const [changeCount, setChangeCount] = useState(0);
-  const [blogTitle, setBlogTitle] = useState();
+// const MyTableToolBarPlugin = () => {};
+
+function Reader({blog }) {
+  const [blogTitle, setBlogTitle] = useState("");
   const [editorState, setEditorState] = useState();
   const [errors, setErrors] = useState();
-  const { isConfirmOpen, serverBlogs, setServerBlogs } = useContext(Context);
+
+  // Catch any errors that occur during Lexical updates and log them
+  // or throw them as needed. If you don't throw them, Lexical will
+  // try to recover gracefully without losing user data.
+  function onError(error) {
+    console.error(error);
+  }
+
   const initialConfig = {
     namespace: "MyEditor",
-    theme,
-    nodes: [HeadingNode, ListNode, ListItemNode],
-    onError,
     editable: false,
+    theme,
+    nodes: [
+      HeadingNode,
+      ListNode,
+      ListItemNode,
+      // BannerNode,
+      TableNode,
+      TableCellNode,
+      ImageNode
+    ],
+    onError,
   };
 
-  return (
-    <LexicalComposer initialConfig={initialConfig} className={"relative z-1 "}>
-      <DeleteButton
-        onDelete={() => {
-          onDelete(blog, serverBlogs, setServerBlogs);
-        }}
-      />
-      <MyToolbarPlugin blog={blog} />
-      <h1
-        className={`text-xl font-semibold flex mx-auto text-center justify-center`}
-      >
-        {blog.title}
-      </h1>
-      <RichTextPlugin
-        contentEditable={
-          <ContentEditable className=" p-4 w-5/6 h-[500px] bg-black text-lime-400  mx-auto rounded border-gray-600 border-[35px] relative text-left overflow-y-scroll z-1" />
-        }
-        placeholder={
-          <div className="rounded text-fuchsia-100">Start Typing...</div>
-        }
-        ErrorBoundary={LexicalErrorBoundary}
-      />
-      <HistoryPlugin />
-      <OnChangePlugin
-        onChange={(lexState) => {
-          setChangeCount((prev) => (prev = prev + 1));
-          console.log(changeCount);
 
-          setEditorState(JSON.stringify(lexState.toJSON()));
-          //save draft to local storage
-        }}
-      />
-    </LexicalComposer>
+
+  function handleSubmit() {
+    // Pessimistic CLear Editor after fetch success
+    console.log("Submitting...");
+    console.log("EditorState:", editorState);
+    const parsedState = JSON.parse(editorState);
+    console.log(parsedState["root"]["children"][0]["children"][0]["text"]);
+    console.log("Title:", blogTitle);
+    if (editorState && blogTitle) {
+      fetch("/api/blogs/new", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title: blogTitle,
+          contentJSON: editorState,
+          // author: userId,
+        }),
+      }).then((r) => {
+        if (r.ok) {
+          r.json().then((data) => {
+            console.log(data);
+          });
+        } else {
+          r.json().then((err) => setErrors(err["error"]));
+        }
+      });
+    }
+  }
+
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+      }}
+    >
+      {errors ? (
+        <div className=" bg-amber-400 text-[rgb(250,0,0)] font-bold">
+          {" "}
+          ERROR: {errors}
+        </div>
+      ) : null}
+      <LexicalComposer initialConfig={initialConfig} className={"relative"}>
+        <LexicalTableOfContentsPlugin>
+          {(tableOfContents, editor) => {
+            // Render your content that uses tableOfContents and editor here
+            // console.log(tableOfContents, editor);
+            // console.log(JSON.stringify(tableOfContents));
+            // console.log(JSON.stringify(editor));
+            return (
+              <TableOfContentsPlugin tableOfContents={tableOfContents} initialShowHideBoolean={false} />
+            );
+          }}
+        </LexicalTableOfContentsPlugin>
+
+        {/* <BannerPlugin /> */}
+        <RichTextPlugin
+          contentEditable={
+            <ContentEditable className="p-4 w-5/6 bg-black text-lime-400  mx-auto rounded border-gray-600 border-[35px] relative text-left" />
+          }
+          placeholder={
+            <div className="rounded text-fuchsia-100">Start Typing...</div>
+          }
+          ErrorBoundary={LexicalErrorBoundary}
+        />
+
+        <HistoryPlugin />
+        <MyAutoFocusPlugin editorState={editorState} setEditorState={setEditorState} blog={blog} />
+      </LexicalComposer>
+    </form>
   );
 }
 
