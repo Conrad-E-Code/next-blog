@@ -6,11 +6,12 @@ import ImagesPlugin from "./ImagePlugin";
 import { Context } from "@/context/Context";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { $getRoot } from "lexical";
+import MyAutoFocusPlugin from "./MyAutoFocusPlugin";
 
 const EditOnlyPluginGroup = ({userId}) => {
   const [editor] = useLexicalComposerContext()
   const [blogTitle, setBlogTitle] = useState();
-  const {editorState} = useContext(Context)
+  const {editorState, setEditorState} = useContext(Context)
 
   function handleFirstDraftSubmit() {
     console.log("Submitting...");
@@ -68,6 +69,10 @@ const EditOnlyPluginGroup = ({userId}) => {
       {/* <TreeViewPlugin /> */}
       <HistoryPlugin />
       <ImagesPlugin captionsEnabled={false} />
+      <MyAutoFocusPlugin
+          editorState={editorState}
+          setEditorState={setEditorState}
+        />
 
       <button
         type="submit"

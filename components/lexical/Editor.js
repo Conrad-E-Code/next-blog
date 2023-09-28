@@ -110,10 +110,6 @@ function Editor({ userId, editable, blog }) {
           ErrorBoundary={LexicalErrorBoundary}
         />
 
-        <MyAutoFocusPlugin
-          editorState={editorState}
-          setEditorState={setEditorState}
-        />
 
         {editable ? <EditOnlyPluginGroup userId={userId} /> : <ReadOnlyPluginGroup blog={blog} />}
       </LexicalComposer>
