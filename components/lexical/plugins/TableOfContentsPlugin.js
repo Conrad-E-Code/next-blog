@@ -10,7 +10,7 @@ const TableOfContentsPlugin = ({ tableOfContents, initialShowHideBoolean }) => {
   const [editor] = useLexicalComposerContext();
   const [toggleShow, setToggleShow] = useState(initialShowHideBoolean);
   return (
-    <div className="fixed z-50 py-2 w-fit">
+    <div className="z-50 py-2 w-fit">
       {!toggleShow ? null : (
         <div className="flex flex-col bg-blue-300/40 rounded shadow">
           {" "}

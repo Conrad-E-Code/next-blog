@@ -15,7 +15,7 @@ const page = async () => {
     <div className=''>
     Welcome! {session["user"]["name"]}
     </div>
-        <EditorContainer userId={session["user"]["_id"]} />
+        <EditorContainer userId={session["user"]["_id"]} editable={true}/>
     </div>
   )
 }

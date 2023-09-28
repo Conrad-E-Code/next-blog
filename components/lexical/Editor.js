@@ -1,5 +1,5 @@
 "use client";
-import TreeViewPlugin from "./plugins/TreeViewPlugin";
+import MyAutoFocusPlugin from "./plugins/MyAutoFocusPlugin";
 import TableOfContentsPlugin from "./plugins/TableOfContentsPlugin";
 import MyToolbarPlugin from "./plugins/toolbar/MyToolbarPlugin";
 import LexicalTableOfContentsPlugin from "@lexical/react/LexicalTableOfContents";
@@ -7,13 +7,8 @@ import { useEffect, useState } from "react";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
-import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
-import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
-import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
 import { HeadingNode } from "@lexical/rich-text";
-import { useContext } from "react";
-import { Context } from "@/context/Context";
 import {
   TableNode,
   TableCellNode,
@@ -25,13 +20,15 @@ import { ListNode, ListItemNode } from "@lexical/list";
 import { BannerNode, BannerPlugin } from "./plugins/BannerPlugin";
 import { ImageNode } from "./nodes/ImageNode/ImageNode";
 import ImagesPlugin from "./plugins/ImagePlugin";
+import EditOnlyPluginGroup from "./plugins/EditOnlyPluginGroup";
+import ReadOnlyPluginGroup from "./plugins/ReadOnlyPluginGroup";
 // import { getParentElement } from "lexical/LexicalUtils";
 const theme = {
   ltr: "text-left",
   text: {
     bold: "font-boldest",
     italic: "italic",
-    underline: "underline"
+    underline: "underline",
   },
   heading: {
     h1: "text-3xl font-bold",
@@ -40,49 +37,17 @@ const theme = {
   },
   list: {
     ul: "list-disc list-inside text-left",
-    ol: "list-decimal list-inside text-left"},
+    ol: "list-decimal list-inside text-left",
+  },
   banner: "bg-red-400",
-  image: "editor-image"
+  image: "editor-image",
 
   // Theme styling goes here
-};
-const MyAutoFocusPlugin = ({editorState, setEditorState}) => {
-  const {userInsideList, setUserInsideList, currentEditorFormat, setCurrentEditorFormat} = useContext(Context)
-
-  const [editor] = useLexicalComposerContext();
-  useEffect(() => {
-    // Focus the editor when the effect fires!
-    editor.focus();
-  }, [editor]);
-
-  function parentIsListOrItem(selection) {
-    const childKey = selection?.anchor?.key
-    const childElement = editor.getElementByKey(childKey)
-    const tagCheck = childElement?.parentElement?.tagName
-    // console.log(tagCheck)
-    if (tagCheck?.includes("UL") || tagCheck?.includes("LI") || tagCheck?.includes("OL")) {
-      // console.log(true)
-      setUserInsideList(true)
-      return true 
-    } else {
-      setUserInsideList(false)
-      // console.log(false)
-      return false
-    }
-  }
-
-  return         <OnChangePlugin
-  onChange={(lexState) => { console.log(JSON.stringify(lexState))
-    parentIsListOrItem(lexState._selection)
-    setEditorState(JSON.stringify(lexState.toJSON()));
-    setCurrentEditorFormat(lexState?._selection?.format)
-  }}
-/>;
 };
 
 // const MyTableToolBarPlugin = () => {};
 
-function Editor({userId }) {
+function Editor({ userId, editable, blog }) {
   const [blogTitle, setBlogTitle] = useState("");
   const [editorState, setEditorState] = useState();
   const [errors, setErrors] = useState();
@@ -95,6 +60,7 @@ function Editor({userId }) {
   }
 
   const initialConfig = {
+    editable,
     namespace: "MyEditor",
     theme,
     nodes: [
@@ -104,86 +70,10 @@ function Editor({userId }) {
       // BannerNode,
       TableNode,
       TableCellNode,
-      ImageNode
+      ImageNode,
     ],
     onError,
   };
-
-
-
-  function handleSubmit() {
-    // Pessimistic CLear Editor after fetch success
-    console.log("Submitting...");
-    console.log("EditorState:", editorState);
-    const parsedState = JSON.parse(editorState);
-    console.log(parsedState["root"]["children"][0]["children"][0]["text"]);
-    console.log("Title:", blogTitle);
-    if (editorState && blogTitle) {
-      fetch("/api/blogs/new", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          title: blogTitle,
-          contentJSON: editorState,
-          author: userId,
-        }),
-      }).then((r) => {
-        if (r.ok) {
-          r.json().then((data) => {
-            console.log(data);
-          });
-        } else {
-          r.json().then((err) => setErrors(err["error"]));
-        }
-      });
-    }
-  }
-  function handleFirstDraftSubmit() {
-    console.log("Submitting...");
-    console.log("EditorState:", editorState);
-    console.log(editorState);
-    const parsedState = JSON.parse(editorState);
-    // console.log(parsedState["root"]["children"][0]["children"][0]["text"])
-
-    if (!blogTitle) {
-      setBlogTitle((prev) => (prev = `SUPER TITLE ${Math.random()}`));
-    }
-
-    if (parsedState?.root?.children?.[0]?.children?.[0]?.text) {
-      setBlogTitle(
-        (prev) =>
-          (prev = parsedState["root"]["children"][0]["children"][0]["text"])
-      );
-    } else setBlogTitle((prev) => (prev = `SUPER TITLE ${Math.random()}`));
-    if (editorState && blogTitle) {
-      console.log("Title:", blogTitle);
-      console.log("SUBMITTTING DRAFT");
-      fetch("/api/blogs/new", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          title: blogTitle,
-          contentJSON: editorState,
-          author: userId,
-        }),
-      }).then((r) => {
-        if (r.ok) {
-          r.json().then((data) => {
-            console.log(data);
-          });
-        } else {
-          r.json().then((err) => console(err["error"]));
-        }
-      });
-    } else {
-      console.log(editorState);
-      console.log(blogTitle);
-    }
-  }
 
   return (
     <form
@@ -205,11 +95,14 @@ function Editor({userId }) {
             // console.log(JSON.stringify(tableOfContents));
             // console.log(JSON.stringify(editor));
             return (
-              <TableOfContentsPlugin tableOfContents={tableOfContents} initialShowHideBoolean={false} />
+              <TableOfContentsPlugin
+                tableOfContents={tableOfContents}
+                initialShowHideBoolean={false}
+              />
             );
           }}
         </LexicalTableOfContentsPlugin>
-        <MyToolbarPlugin />
+        {editable && <MyToolbarPlugin />}
         {/* <BannerPlugin /> */}
         <RichTextPlugin
           contentEditable={
@@ -221,28 +114,12 @@ function Editor({userId }) {
           ErrorBoundary={LexicalErrorBoundary}
         />
 
-        <HistoryPlugin />
-        <ImagesPlugin captionsEnabled={false} />
-        <MyAutoFocusPlugin editorState={editorState} setEditorState={setEditorState} />
-        <button
-          type="submit"
-          onClick={(e) => {
-            e.preventDefault();
-            handleSubmit();
-          }}
-        >
-          SUBMIT
-        </button>
-        <button
-          type="submit"
-          onClick={(e) => {
-            e.preventDefault();
-            handleFirstDraftSubmit();
-          }}
-        >
-          TEST
-        </button>
-        <TreeViewPlugin />
+        <MyAutoFocusPlugin
+          editorState={editorState}
+          setEditorState={setEditorState}
+        />
+
+        {editable ? <EditOnlyPluginGroup userId={userId} /> : <ReadOnlyPluginGroup blog={blog} />}
       </LexicalComposer>
     </form>
   );
