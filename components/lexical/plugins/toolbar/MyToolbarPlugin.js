@@ -8,6 +8,7 @@ import {AiOutlineOrderedList, AiOutlineUnorderedList, AiOutlineFileImage, } from
 import {BsCodeSlash} from "react-icons/bs"
 import {CgLink} from "react-icons/cg"
 import HistoryToolbarPlugin from "./HistoryToolbarPlugin";
+import InsertToolbarPlugin from "./InsertToolbarPlugin";
 
 // import {
 //   TableNode,
@@ -64,18 +65,9 @@ export default function MyToolbarPlugin() {
       <MyListToolbarPlugin />
       <FormatOptionsPlugin />
       <HistoryToolbarPlugin />
+      <InsertToolbarPlugin />
       {/* <MyBannerToolbarPlugin /> */}
-
-      <div
-      title="Load editor template"
-        onClick={() => {
-          editor.update(() => {
-            handleLoadEditorState();
-          });
-        }}
-      >
-        LOAD EDITOR TEMPLATE
-      </div>
+      
     </div>
   );
 }

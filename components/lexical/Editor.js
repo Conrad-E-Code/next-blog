@@ -1,4 +1,5 @@
 "use client";
+import TreeViewPlugin from "./plugins/TreeViewPlugin";
 import TableOfContentsPlugin from "./plugins/TableOfContentsPlugin";
 import MyToolbarPlugin from "./plugins/toolbar/MyToolbarPlugin";
 import LexicalTableOfContentsPlugin from "@lexical/react/LexicalTableOfContents";
@@ -22,6 +23,8 @@ import {
 } from "@lexical/table";
 import { ListNode, ListItemNode } from "@lexical/list";
 import { BannerNode, BannerPlugin } from "./plugins/BannerPlugin";
+import { ImageNode } from "./nodes/ImageNode/ImageNode";
+import ImagesPlugin from "./plugins/ImagePlugin";
 // import { getParentElement } from "lexical/LexicalUtils";
 const theme = {
   ltr: "text-left",
@@ -39,6 +42,7 @@ const theme = {
     ul: "list-disc list-inside text-left",
     ol: "list-decimal list-inside text-left"},
   banner: "bg-red-400",
+  image: "editor-image"
 
   // Theme styling goes here
 };
@@ -52,11 +56,11 @@ const MyAutoFocusPlugin = ({editorState, setEditorState}) => {
   }, [editor]);
 
   function parentIsListOrItem(selection) {
-    const childKey = selection?.anchor.key
+    const childKey = selection?.anchor?.key
     const childElement = editor.getElementByKey(childKey)
-    const tagCheck = childElement.parentElement.tagName
+    const tagCheck = childElement?.parentElement?.tagName
     // console.log(tagCheck)
-    if (tagCheck.includes("UL") || tagCheck.includes("LI") || tagCheck.includes("OL")) {
+    if (tagCheck?.includes("UL") || tagCheck?.includes("LI") || tagCheck?.includes("OL")) {
       // console.log(true)
       setUserInsideList(true)
       return true 
@@ -71,7 +75,7 @@ const MyAutoFocusPlugin = ({editorState, setEditorState}) => {
   onChange={(lexState) => { console.log(JSON.stringify(lexState))
     parentIsListOrItem(lexState._selection)
     setEditorState(JSON.stringify(lexState.toJSON()));
-    setCurrentEditorFormat(lexState._selection.format)
+    setCurrentEditorFormat(lexState?._selection?.format)
   }}
 />;
 };
@@ -100,6 +104,7 @@ function Editor({userId }) {
       // BannerNode,
       TableNode,
       TableCellNode,
+      ImageNode
     ],
     onError,
   };
@@ -217,6 +222,7 @@ function Editor({userId }) {
         />
 
         <HistoryPlugin />
+        <ImagesPlugin captionsEnabled={false} />
         <MyAutoFocusPlugin editorState={editorState} setEditorState={setEditorState} />
         <button
           type="submit"
@@ -236,6 +242,7 @@ function Editor({userId }) {
         >
           TEST
         </button>
+        <TreeViewPlugin />
       </LexicalComposer>
     </form>
   );
