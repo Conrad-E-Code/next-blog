@@ -1,3 +1,4 @@
+"use client";
 import { useContext } from "react";
 import { Context } from "@/context/Context";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
@@ -9,10 +10,15 @@ const MyAutoFocusPlugin = ({ editorState, setEditorState }) => {
     setUserInsideList,
     currentEditorFormat,
     setCurrentEditorFormat,
+    changeCount,
+    setChangeCount
   } = useContext(Context);
 
   const [editor] = useLexicalComposerContext();
   useEffect(() => {
+    editor.update(()=>{
+      editor.setEditorState(editor.parseEditorState(sessionStorage.getItem("autosave")))
+    })
     // Focus the editor when the effect fires!
     editor.focus();
   }, [editor]);
@@ -44,6 +50,12 @@ const MyAutoFocusPlugin = ({ editorState, setEditorState }) => {
         parentIsListOrItem(lexState._selection);
         setEditorState(JSON.stringify(lexState.toJSON()));
         setCurrentEditorFormat(lexState?._selection?.format);
+        setChangeCount(prev => prev+=1)
+        if (changeCount > 79) {
+          sessionStorage.setItem("autosave", editorState)
+          setChangeCount(0)
+        }
+        console.log(changeCount)
       }}
     />
   );

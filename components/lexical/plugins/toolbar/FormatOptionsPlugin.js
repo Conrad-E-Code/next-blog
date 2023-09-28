@@ -98,14 +98,14 @@ const FormatOptionsPlugin = () => {
               if (
                 option.formatCodes?.includes(`${String(currentEditorFormat)}`)
               ) {
-                console.log(option.command);
+                // console.log(option.command);
                 return (
                   <div key={`option-item-${option.command}`} className=" bg-gray-500 border-black border-solid border-[1px] shadow p-1">
                     {option.icon}
                   </div>
                 );
               } else {
-                console.log("else");
+                // console.log("else");
                 return <div className=" p-1 border-[1px] border-transparent">{option.icon}</div>;
               }
             })}
