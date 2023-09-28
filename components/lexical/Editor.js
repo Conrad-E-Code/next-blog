@@ -3,7 +3,7 @@ import MyAutoFocusPlugin from "./plugins/MyAutoFocusPlugin";
 import TableOfContentsPlugin from "./plugins/TableOfContentsPlugin";
 import MyToolbarPlugin from "./plugins/toolbar/MyToolbarPlugin";
 import LexicalTableOfContentsPlugin from "@lexical/react/LexicalTableOfContents";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
@@ -22,6 +22,7 @@ import { ImageNode } from "./nodes/ImageNode/ImageNode";
 import ImagesPlugin from "./plugins/ImagePlugin";
 import EditOnlyPluginGroup from "./plugins/EditOnlyPluginGroup";
 import ReadOnlyPluginGroup from "./plugins/ReadOnlyPluginGroup";
+import { Context } from "@/context/Context";
 // import { getParentElement } from "lexical/LexicalUtils";
 const theme = {
   ltr: "text-left",
@@ -48,8 +49,7 @@ const theme = {
 // const MyTableToolBarPlugin = () => {};
 
 function Editor({ userId, editable, blog }) {
-  const [blogTitle, setBlogTitle] = useState("");
-  const [editorState, setEditorState] = useState();
+  const {editorState, setEditorState} = useContext(Context);
   const [errors, setErrors] = useState();
 
   // Catch any errors that occur during Lexical updates and log them
@@ -76,18 +76,14 @@ function Editor({ userId, editable, blog }) {
   };
 
   return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-      }}
-    >
-      {errors ? (
+
+      <LexicalComposer initialConfig={initialConfig} className={"relative"}>
+              {errors ? (
         <div className=" bg-amber-400 text-[rgb(250,0,0)] font-bold">
           {" "}
           ERROR: {errors}
         </div>
       ) : null}
-      <LexicalComposer initialConfig={initialConfig} className={"relative"}>
         <LexicalTableOfContentsPlugin>
           {(tableOfContents, editor) => {
             // Render your content that uses tableOfContents and editor here
@@ -106,7 +102,7 @@ function Editor({ userId, editable, blog }) {
         {/* <BannerPlugin /> */}
         <RichTextPlugin
           contentEditable={
-            <ContentEditable className="p-4 w-5/6 bg-black text-lime-400  mx-auto rounded border-gray-600 border-[35px] relative text-left" />
+            <ContentEditable className="p-4 w-5/6 bg-slate-300 text-black  mx-auto rounded border-gray-600 border-[2px] relative text-left" />
           }
           placeholder={
             <div className="rounded text-fuchsia-100">Start Typing...</div>
@@ -121,7 +117,6 @@ function Editor({ userId, editable, blog }) {
 
         {editable ? <EditOnlyPluginGroup userId={userId} /> : <ReadOnlyPluginGroup blog={blog} />}
       </LexicalComposer>
-    </form>
   );
 }
 

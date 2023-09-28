@@ -27,7 +27,7 @@ const NavBar = ({session}) => {
         )
     })
   return (
-    <div className='fixed top-0 left-0 w-full text-white flex font-bold bg-green-100 py-2'>
+    <div className='fixed top-0 left-0 w-full text-white flex font-bold bg-green-100 py-2 z-50'>
         {renderedLinks}</div>
   )
 }

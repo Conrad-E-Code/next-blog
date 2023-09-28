@@ -22,7 +22,7 @@ const UserBlogList = ({ session }) => {
         // console.log(blogObj)
         return (
           <div>
-            <EditorContainer editable={false} blog={blogObj} />
+            <EditorContainer userId={session._id} editable={false} blog={blogObj} />
           </div>
         );
       })}
