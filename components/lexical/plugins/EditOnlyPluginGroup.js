@@ -1,38 +1,16 @@
-import React from "react";
+"use client";
+import React, { useContext, useState } from "react";
 import TreeViewPlugin from "./TreeViewPlugin";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import ImagesPlugin from "./ImagePlugin";
+import { Context } from "@/context/Context";
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { $getRoot } from "lexical";
 
 const EditOnlyPluginGroup = ({userId}) => {
-  function handleSubmit() {
-    // Pessimistic CLear Editor after fetch success
-    console.log("Submitting...");
-    console.log("EditorState:", editorState);
-    const parsedState = JSON.parse(editorState);
-    console.log(parsedState["root"]["children"][0]["children"][0]["text"]);
-    console.log("Title:", blogTitle);
-    if (editorState && blogTitle) {
-      fetch("/api/blogs/new", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          title: blogTitle,
-          contentJSON: editorState,
-          author: userId,
-        }),
-      }).then((r) => {
-        if (r.ok) {
-          r.json().then((data) => {
-            console.log(data);
-          });
-        } else {
-          r.json().then((err) => setErrors(err["error"]));
-        }
-      });
-    }
-  }
+  const [editor] = useLexicalComposerContext()
+  const [blogTitle, setBlogTitle] = useState();
+  const {editorState} = useContext(Context)
 
   function handleFirstDraftSubmit() {
     console.log("Submitting...");
@@ -43,9 +21,11 @@ const EditOnlyPluginGroup = ({userId}) => {
 
     if (!blogTitle) {
       setBlogTitle((prev) => (prev = `SUPER TITLE ${Math.random()}`));
+      console.log("joe")
     }
 
-    if (parsedState?.root?.children?.[0]?.children?.[0]?.text) {
+    if (parsedState?.root?.children[0]?.children[0]?.text) {
+      console.log("bill")
       setBlogTitle(
         (prev) =>
           (prev = parsedState["root"]["children"][0]["children"][0]["text"])
@@ -68,6 +48,10 @@ const EditOnlyPluginGroup = ({userId}) => {
         if (r.ok) {
           r.json().then((data) => {
             console.log(data);
+            editor.update(() => {
+              $getRoot().clear();
+            })
+
           });
         } else {
           r.json().then((err) => console(err["error"]));
@@ -84,15 +68,7 @@ const EditOnlyPluginGroup = ({userId}) => {
       {/* <TreeViewPlugin /> */}
       <HistoryPlugin />
       <ImagesPlugin captionsEnabled={false} />
-      <button
-        type="submit"
-        onClick={(e) => {
-          e.preventDefault();
-          handleSubmit();
-        }}
-      >
-        SUBMIT
-      </button>
+
       <button
         type="submit"
         onClick={(e) => {

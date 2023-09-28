@@ -15,6 +15,10 @@ export const ContextProvider = ({ children }) => {
 // SERVER BLOGS FOR USERBLOGLIST
 const [serverBlogs, setServerBlogs] = useState([])
 
+// Editor State
+
+const [editorState, setEditorState] = useState()
+
   // Delet button component confirm popup
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   return (
@@ -31,7 +35,9 @@ const [serverBlogs, setServerBlogs] = useState([])
         userInsideList,
         setUserInsideList,
         currentEditorFormat,
-        setCurrentEditorFormat
+        setCurrentEditorFormat,
+        editorState,
+        setEditorState
       }}>
       {children}
     </Context.Provider>
