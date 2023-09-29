@@ -19,8 +19,8 @@ const [serverBlogs, setServerBlogs] = useState([])
 
 const [editorState, setEditorState] = useState()
 
-// Change count for autosave
-const [changeCount, setChangeCount] = useState(0)
+// Detect changes from the editor
+const [changesDetected, setChangesDetected] = useState(false)
 
   // Delet button component confirm popup
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
@@ -41,8 +41,9 @@ const [changeCount, setChangeCount] = useState(0)
         setCurrentEditorFormat,
         editorState,
         setEditorState,
-        changeCount,
-        setChangeCount
+        changesDetected,
+        setChangesDetected
+
       }}>
       {children}
     </Context.Provider>
