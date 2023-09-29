@@ -3,7 +3,7 @@ import MyAutoFocusPlugin from "./plugins/MyAutoFocusPlugin";
 import TableOfContentsPlugin from "./plugins/TableOfContentsPlugin";
 import MyToolbarPlugin from "./plugins/toolbar/MyToolbarPlugin";
 import LexicalTableOfContentsPlugin from "@lexical/react/LexicalTableOfContents";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
@@ -23,6 +23,14 @@ import ImagesPlugin from "./plugins/ImagePlugin";
 import EditOnlyPluginGroup from "./plugins/EditOnlyPluginGroup";
 import ReadOnlyPluginGroup from "./plugins/ReadOnlyPluginGroup";
 import { Context } from "@/context/Context";
+
+import { Inter, Roboto, Open_Sans  } from 'next/font/google'
+
+const inter = Inter({ subsets: ['latin'], weight:[ '100', '300', '400', '500', '700', '900']})
+const roboto = Roboto({subsets: ['latin'], weight:[ '100', '300', '400', '500', '700', '900']})
+const openSans = Open_Sans({subsets: ['latin'], weight: ["300", "400", "500", "600", "700", "800"]})
+
+console.log("roboto", roboto)
 // import { getParentElement } from "lexical/LexicalUtils";
 const theme = {
   ltr: "text-left",
@@ -49,8 +57,26 @@ const theme = {
 // const MyTableToolBarPlugin = () => {};
 
 function Editor({ userId, editable, blog }) {
-  const {editorState, setEditorState} = useContext(Context);
   const [errors, setErrors] = useState();
+  const [fontSize, setFontSize] = useState("12"); // Initial font size
+  const [fontType, setFontType] = useState(""); // Initial font type
+  const handleFontSizeChange = (value) => {
+    setFontSize(prev => prev = value.toString());
+    console.log(fontSize)
+  };
+
+  const handleFontTypeChange = (value) => {
+
+    if (value === "Times New Roman"){
+    setFontType((prev) => (prev = "font-timesnewroman"));
+    } else if (value === "Arial") {
+      setFontType((prev) => { prev = "font-arial"})
+    } else if (value === "Verdana") {
+      setFontType((prev) => { prev = "font-verdana"
+      })
+    }
+
+  };
 
   // Catch any errors that occur during Lexical updates and log them
   // or throw them as needed. If you don't throw them, Lexical will
@@ -76,43 +102,52 @@ function Editor({ userId, editable, blog }) {
   };
 
   return (
-
-      <LexicalComposer initialConfig={initialConfig} className={"relative"}>
-              {errors ? (
+    <LexicalComposer initialConfig={initialConfig} className={"relative"}>
+      {errors ? (
         <div className=" bg-amber-400 text-[rgb(250,0,0)] font-bold">
           {" "}
           ERROR: {errors}
         </div>
       ) : null}
-        <LexicalTableOfContentsPlugin>
-          {(tableOfContents, editor) => {
-            // Render your content that uses tableOfContents and editor here
-            // console.log(tableOfContents, editor);
-            // console.log(JSON.stringify(tableOfContents));
-            // console.log(JSON.stringify(editor));
-            return (
-              <TableOfContentsPlugin
-                tableOfContents={tableOfContents}
-                initialShowHideBoolean={false}
-              />
-            );
-          }}
-        </LexicalTableOfContentsPlugin>
-        {editable && <MyToolbarPlugin />}
-        {/* <BannerPlugin /> */}
-        <RichTextPlugin
-          contentEditable={
-            <ContentEditable className="p-4 w-5/6 bg-slate-300 text-black  mx-auto rounded border-gray-600 border-[2px] relative text-left" />
-          }
-          placeholder={
-            <div className="rounded text-fuchsia-100">Start Typing...</div>
-          }
-          ErrorBoundary={LexicalErrorBoundary}
+      <LexicalTableOfContentsPlugin>
+        {(tableOfContents, editor) => {
+          // Render your content that uses tableOfContents and editor here
+          // console.log(tableOfContents, editor);
+          // console.log(JSON.stringify(tableOfContents));
+          // console.log(JSON.stringify(editor));
+          return (
+            <TableOfContentsPlugin
+              tableOfContents={tableOfContents}
+              initialShowHideBoolean={false}
+            />
+          );
+        }}
+      </LexicalTableOfContentsPlugin>
+      {editable && (
+        <MyToolbarPlugin
+          fontSize={fontSize}
+          fontType={fontType}
+          handleFontSizeChange={handleFontSizeChange}
+          handleFontTypeChange={handleFontTypeChange}
         />
+      )}
+      {/* <BannerPlugin /> */}
+      <RichTextPlugin
+        contentEditable={
+          <ContentEditable style={{fontSize: `${fontSize}px`}} className={`p-4 w-5/6 bg-slate-300 text-black  mx-auto rounded border-gray-600 border-[2px] relative text-left ${fontType}`} />
+        }
+        placeholder={
+          <div className="rounded text-fuchsia-100">Start Typing...</div>
+        }
+        ErrorBoundary={LexicalErrorBoundary}
+      />
 
-
-        {editable ? <EditOnlyPluginGroup userId={userId} /> : <ReadOnlyPluginGroup blog={blog} />}
-      </LexicalComposer>
+      {editable ? (
+        <EditOnlyPluginGroup userId={userId} />
+      ) : (
+        <ReadOnlyPluginGroup blog={blog} />
+      )}
+    </LexicalComposer>
   );
 }
 
